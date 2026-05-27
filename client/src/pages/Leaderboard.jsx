@@ -1,3 +1,9 @@
+/**
+ * Leaderboard — mobile-first, premium, card-based layout
+ * ∙ No tables, no excessive animations
+ * ∙ Name = primary focus, Score = visually dominant
+ * ∙ 44–56px touch targets throughout
+ */
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -5,62 +11,42 @@ import api from '@/lib/api'
 import { LEAGUES } from '@/data/content'
 import { useAuthStore } from '@/store/authStore'
 
-/* ── Stripe texture ──────────────────────────────────────────── */
-const STRIPE = {
-  backgroundImage: 'repeating-linear-gradient(135deg,#fff 0,#fff 1px,transparent 0,transparent 50%)',
-  backgroundSize: '14px 14px',
-}
+/* ── helpers ─────────────────────────────────────────────────── */
+const fadeUp = (delay = 0) => ({
+  initial:    { opacity: 0, y: 10 },
+  animate:    { opacity: 1, y: 0  },
+  transition: { duration: 0.22, delay },
+})
 
 /* ══════════════════════════════════════════════════════════════
-   LeagueChip — horizontal scrollable selector
+   LeagueChip
 ══════════════════════════════════════════════════════════════ */
 function LeagueChip({ lg, active, isUser, onClick }) {
   return (
     <motion.button
       onClick={onClick}
-      whileTap={{ scale: 0.88 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+      whileTap={{ scale: 0.92 }}
       className="relative flex-shrink-0 flex flex-col items-center justify-center rounded-xl cursor-pointer"
       style={{
-        width: active ? 62 : 50,
-        height: 56,
-        background: active
-          ? `linear-gradient(145deg,${lg.bg},${lg.bg}bb)`
-          : 'rgba(255,255,255,0.03)',
-        border: `1.5px solid ${active ? lg.color + '70' : 'rgba(255,255,255,0.06)'}`,
-        boxShadow: active ? `0 0 18px ${lg.glowColor}, 0 4px 12px rgba(0,0,0,0.4)` : 'none',
-        transition: 'width 0.25s ease, background 0.2s, border-color 0.2s, box-shadow 0.2s',
-        gap: 4,
+        width:      active ? 60 : 48,
+        height:     52,
+        gap:        4,
+        background: active ? lg.bg + 'cc' : 'rgba(255,255,255,0.03)',
+        border:     `1.5px solid ${active ? lg.color + '65' : 'rgba(255,255,255,0.06)'}`,
+        boxShadow:  active ? `0 0 16px ${lg.glowColor}` : 'none',
+        transition: 'width 0.22s ease, background 0.18s, border-color 0.18s, box-shadow 0.18s',
       }}
     >
-      {/* "СЕН" badge on user's league */}
       {isUser && (
         <div
-          className="absolute -top-1.5 -right-1.5 text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none"
-          style={{ background: '#58CC02', color: '#fff', boxShadow: '0 2px 8px rgba(88,204,2,0.5)' }}
+          className="absolute -top-1.5 -right-1.5 font-black rounded-full"
+          style={{ fontSize: 7, background: '#58CC02', color: '#fff', padding: '2px 5px', lineHeight: 1.4 }}
         >
           СЕН
         </div>
       )}
-
-      {/* Emoji */}
-      <motion.span
-        animate={active ? { scale: [1, 1.1, 1] } : { scale: 1 }}
-        transition={{ duration: 2.8, repeat: active ? Infinity : 0, ease: 'easeInOut' }}
-        style={{ fontSize: active ? 22 : 17, lineHeight: 1 }}
-      >
-        {lg.emoji}
-      </motion.span>
-
-      {/* Name */}
-      <span
-        className="font-black leading-none"
-        style={{
-          fontSize: 7,
-          color: active ? lg.color : '#2d3448',
-          letterSpacing: '0.06em',
-        }}
-      >
+      <span style={{ fontSize: active ? 21 : 17, lineHeight: 1 }}>{lg.emoji}</span>
+      <span style={{ fontSize: 7, fontWeight: 900, color: active ? lg.color : '#2d3448', letterSpacing: '0.06em' }}>
         {lg.name}
       </span>
     </motion.button>
@@ -68,180 +54,184 @@ function LeagueChip({ lg, active, isUser, onClick }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   Avatar
+   League hero card  (compact, info-dense, NO infinite animations)
 ══════════════════════════════════════════════════════════════ */
-function Avatar({ emoji, size = 40, rank }) {
-  const ringColor = rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : null
-
+function LeagueHero({ lg, myRank, me, daysLeft }) {
   return (
-    <div className="relative flex-shrink-0">
-      <motion.div
-        animate={rank === 1 ? {
-          boxShadow: ['0 0 0 0 #FFD70000','0 0 0 6px #FFD70030','0 0 0 0 #FFD70000'],
-        } : {}}
-        transition={{ duration: 2.4, repeat: Infinity }}
-        className="rounded-full flex items-center justify-center"
-        style={{
-          width: size, height: size, fontSize: size * 0.46,
-          background: 'linear-gradient(145deg,#1a2640,#0d1628)',
-          border: `2px solid ${ringColor || 'rgba(255,255,255,0.08)'}`,
-        }}
-      >
-        {emoji || '👤'}
-      </motion.div>
-      {rank === 1 && (
-        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-base leading-none select-none">
-          👑
+    <div
+      className="rounded-2xl overflow-hidden mb-4"
+      style={{
+        background: `linear-gradient(145deg,${lg.bg} 0%,${lg.bg}66 60%,#07090f 100%)`,
+        border: `1px solid ${lg.color}28`,
+      }}
+    >
+      {/* Identity row */}
+      <div className="flex items-center gap-3 px-4 py-3.5">
+        <span style={{ fontSize: 28, lineHeight: 1, flexShrink: 0 }}>{lg.emoji}</span>
+        <div className="flex-1 min-w-0">
+          <div style={{ fontSize: 8, fontWeight: 900, letterSpacing: '0.12em', color: lg.color, textTransform: 'uppercase' }}>
+            Жумалык рейтинг
+          </div>
+          <div className="font-black text-base text-white leading-tight">{lg.name} Лигасы</div>
         </div>
-      )}
+        <div
+          className="flex-shrink-0 font-black rounded-full px-2.5 py-1"
+          style={{ fontSize: 10, background: lg.color + '18', color: lg.color, border: `1px solid ${lg.color}30` }}
+        >
+          Жогорку 5 → ↑
+        </div>
+      </div>
+
+      {/* Stats strip */}
+      <div
+        className="grid grid-cols-3"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+      >
+        {[
+          { v: myRank ? `#${myRank}` : '—',          sub: 'ОРНУМ',    c: '#1CB0F6' },
+          { v: (me?.weeklyXP ?? 0).toLocaleString(),  sub: 'ЖУМА XP',  c: '#58CC02' },
+          { v: `${daysLeft} күн`,                     sub: 'КАЛДЫ',    c: '#FF9600' },
+        ].map(({ v, sub, c }, i) => (
+          <div
+            key={sub}
+            className="py-3 text-center"
+            style={{ borderRight: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
+          >
+            <div className="font-black text-sm leading-none" style={{ color: c }}>{v}</div>
+            <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: '#2d3448', marginTop: 3 }}>{sub}</div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
 
 /* ══════════════════════════════════════════════════════════════
-   Podium
+   Top-3 spotlight  (compact 3-column, no animated bars)
 ══════════════════════════════════════════════════════════════ */
-function Podium({ top3, lg }) {
-  if (top3.length < 3) return null
-
-  const SLOTS = [
-    { u: top3[1], rank: 2, barH: 48,  avSz: 40, color: '#C0C0C0', medal: '🥈' },
-    { u: top3[0], rank: 1, barH: 72,  avSz: 52, color: '#FFD700', medal: '🥇' },
-    { u: top3[2], rank: 3, barH: 32,  avSz: 36, color: '#CD7F32', medal: '🥉' },
-  ]
+function TopThree({ entries }) {
+  const MEDALS = ['🥇', '🥈', '🥉']
+  const COLORS = ['#FFD700', '#C0C0C0', '#CD7F32']
+  // Display order: 2nd, 1st, 3rd
+  const ORDER  = [1, 0, 2]
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 22 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1, duration: 0.38 }}
-      className="rounded-2xl overflow-hidden mb-4"
-      style={{ background: '#0d1220', border: '1px solid rgba(255,255,255,0.07)' }}
+    <div
+      className="rounded-2xl p-3 mb-4 grid grid-cols-3 gap-2"
+      style={{ background: '#0c1018', border: '1px solid rgba(255,255,255,0.07)' }}
     >
-      {/* Header */}
-      <div
-        className="px-4 py-3 flex items-center gap-2"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
-      >
-        <span className="text-xl leading-none">{lg?.emoji}</span>
-        <span className="font-extrabold text-sm text-white">Топ 3</span>
-        <span className="ml-auto text-[0.58rem] font-bold" style={{ color: '#2d3448' }}>
-          жума лидерлери
-        </span>
-      </div>
-
-      {/* Podium */}
-      <div className="flex items-end justify-center gap-1.5 px-2 pt-6 pb-0">
-        {SLOTS.map(({ u, rank, barH, avSz, color, medal }, pi) => (
+      {ORDER.map((idx, pos) => {
+        const u = entries[idx]
+        const c = COLORS[idx]
+        return (
           <motion.div
-            key={rank}
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18 + pi * 0.1, type: 'spring', stiffness: 220, damping: 22 }}
-            className="flex flex-col items-center flex-1"
+            key={idx}
+            {...fadeUp(pos * 0.06)}
+            className="flex flex-col items-center gap-1 py-1"
           >
-            <Avatar emoji={u?.avatar} size={avSz} rank={rank} />
+            {/* Avatar */}
             <div
-              className="mt-2 font-extrabold text-center truncate w-full"
-              style={{ color: rank === 1 ? '#fff' : '#7a859e', fontSize: rank === 1 ? 11 : 10 }}
+              className="rounded-full flex items-center justify-center"
+              style={{
+                width: idx === 0 ? 48 : 40,
+                height: idx === 0 ? 48 : 40,
+                fontSize: idx === 0 ? 22 : 18,
+                background: 'linear-gradient(145deg,#1a2640,#0d1628)',
+                border: `2px solid ${c}`,
+                boxShadow: idx === 0 ? `0 0 16px ${c}40` : 'none',
+              }}
+            >
+              {u?.avatar || '👤'}
+            </div>
+
+            {/* Medal + name */}
+            <div style={{ fontSize: idx === 0 ? 20 : 17 }}>{MEDALS[idx]}</div>
+            <div
+              className="font-extrabold text-center w-full truncate px-1"
+              style={{ fontSize: idx === 0 ? 11 : 10, color: idx === 0 ? '#fff' : '#7a859e' }}
             >
               {u?.name}
             </div>
-            <div
-              className="font-black mb-2"
-              style={{ color, fontSize: 9 }}
-            >
-              {(u?.weeklyXP || 0).toLocaleString()} XP
+            <div className="font-black" style={{ fontSize: 10, color: c }}>
+              {(u?.weeklyXP || 0).toLocaleString()}
             </div>
-
-            {/* Animated bar */}
-            <motion.div
-              initial={{ height: 0 }}
-              animate={{ height: barH }}
-              transition={{ delay: 0.38 + pi * 0.1, duration: 0.65, ease: [0.34, 1.56, 0.64, 1] }}
-              className="w-full rounded-t-2xl flex items-center justify-center relative overflow-hidden"
-              style={{
-                background: `linear-gradient(180deg,${color}22,${color}08)`,
-                border: `1px solid ${color}30`,
-                borderBottom: 'none',
-              }}
-            >
-              <div className="absolute inset-0 opacity-[0.04]" style={STRIPE} />
-              <span style={{ fontSize: 20 }}>{medal}</span>
-            </motion.div>
           </motion.div>
-        ))}
-      </div>
-    </motion.div>
+        )
+      })}
+    </div>
   )
 }
 
 /* ══════════════════════════════════════════════════════════════
-   RankRow
+   RankCard  — name = primary, score = visually dominant
 ══════════════════════════════════════════════════════════════ */
-function RankRow({ u, rank, isMe, idx }) {
-  const medals = { 1: '🥇', 2: '🥈', 3: '🥉' }
-  const accentMap = { 1: '#FFD700', 2: '#B8BCC8', 3: '#CD7F32' }
-  const accent = accentMap[rank]
+function RankCard({ u, rank, isMe, idx }) {
+  const MEDALS = { 1: '🥇', 2: '🥈', 3: '🥉' }
+  const ACCENT = { 1: '#FFD700', 2: '#C0C0C0', 3: '#CD7F32' }
+  const accent = ACCENT[rank] || (isMe ? '#1CB0F6' : null)
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -18 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: idx * 0.028, type: 'spring', stiffness: 300, damping: 28 }}
-      className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl relative overflow-hidden"
+      {...fadeUp(idx * 0.03)}
+      className="flex items-center gap-3 px-3.5 rounded-2xl"
       style={{
+        height: 56,
         background: isMe
-          ? 'linear-gradient(135deg,rgba(28,176,246,0.1),rgba(28,176,246,0.03))'
-          : rank <= 3
-            ? `linear-gradient(135deg,${accent}09,transparent)`
-            : 'rgba(255,255,255,0.015)',
+          ? 'linear-gradient(135deg,rgba(28,176,246,0.07),rgba(28,176,246,0.02))'
+          : 'rgba(255,255,255,0.02)',
         border: `1px solid ${
-          isMe      ? 'rgba(28,176,246,0.3)' :
-          rank <= 3 ? `${accent}20`          :
-          'rgba(255,255,255,0.04)'
+          isMe      ? 'rgba(28,176,246,0.22)' :
+          rank <= 3 ? (accent + '22')          :
+          'rgba(255,255,255,0.05)'
         }`,
+        /* Left accent strip via outline workaround */
+        borderLeft: `3px solid ${accent || 'transparent'}`,
       }}
     >
-      {/* Left accent strip */}
-      {(rank <= 3 || isMe) && (
-        <div
-          className="absolute left-0 top-[18%] bottom-[18%] w-[3px] rounded-r-full"
-          style={{ background: isMe ? '#1CB0F6' : accent }}
-        />
-      )}
-
       {/* Rank */}
-      <div className="w-8 text-center flex-shrink-0">
-        {medals[rank]
-          ? <span className="text-base leading-none">{medals[rank]}</span>
-          : <span className="font-black text-xs" style={{ color: '#2d3448' }}>#{rank}</span>
+      <div className="w-7 text-center flex-shrink-0">
+        {MEDALS[rank]
+          ? <span style={{ fontSize: 17 }}>{MEDALS[rank]}</span>
+          : <span className="font-black" style={{ fontSize: 11, color: '#2d3448' }}>#{rank}</span>
         }
       </div>
 
-      <Avatar emoji={u.avatar} size={34} rank={rank <= 3 ? rank : null} />
+      {/* Avatar */}
+      <div
+        className="rounded-full flex items-center justify-center flex-shrink-0"
+        style={{
+          width: 36, height: 36, fontSize: 17,
+          background: 'linear-gradient(145deg,#1a2640,#0d1628)',
+          border: `1.5px solid ${accent || 'rgba(255,255,255,0.08)'}`,
+        }}
+      >
+        {u.avatar || '👤'}
+      </div>
 
+      {/* Name (PRIMARY FOCUS) + streak */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className="font-bold text-sm truncate text-white">{u.name}</span>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="font-black text-[15px] text-white truncate leading-tight">{u.name}</span>
           {isMe && (
             <span
-              className="flex-shrink-0 px-1.5 py-0.5 rounded-full font-black leading-none"
-              style={{ fontSize: 9, background: 'rgba(28,176,246,0.18)', color: '#1CB0F6' }}
+              className="flex-shrink-0 font-black rounded-full"
+              style={{ fontSize: 8, padding: '2px 6px', background: 'rgba(28,176,246,0.2)', color: '#1CB0F6' }}
             >
               СЕН
             </span>
           )}
         </div>
-        <div className="text-[0.58rem] font-bold mt-0.5" style={{ color: '#FF9600' }}>
+        <div style={{ fontSize: 11, color: '#FF9600', fontWeight: 700, marginTop: 1 }}>
           🔥 {u.streak || 0} күн
         </div>
       </div>
 
+      {/* Score (VISUALLY DOMINANT) */}
       <div className="text-right flex-shrink-0">
         <div
-          className="font-black text-sm"
+          className="font-black leading-none"
           style={{
+            fontSize: 17,
             color: rank === 1 ? '#FFD700' :
                    rank === 2 ? '#C0C0C0' :
                    rank === 3 ? '#CD7F32' :
@@ -250,54 +240,49 @@ function RankRow({ u, rank, isMe, idx }) {
         >
           {(u.weeklyXP || 0).toLocaleString()}
         </div>
-        <div className="font-black tracking-widest" style={{ fontSize: 9, color: '#2d3448' }}>XP</div>
+        <div style={{ fontSize: 8, fontWeight: 900, color: '#2d3448', letterSpacing: '0.1em', marginTop: 2 }}>XP</div>
       </div>
     </motion.div>
   )
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ZoneBadge
+   Zone separator
 ══════════════════════════════════════════════════════════════ */
-function ZoneBadge({ color, icon, label }) {
+function Zone({ color, label }) {
   return (
-    <div className="flex items-center gap-2.5 my-3">
-      <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg,${color}35,transparent)` }} />
-      <div
-        className="flex items-center gap-1 px-3 py-1 rounded-full font-black tracking-widest uppercase"
-        style={{
-          fontSize: 9,
-          background: `${color}10`,
-          color,
-          border: `1px solid ${color}28`,
-        }}
+    <div className="flex items-center gap-2 my-2.5">
+      <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg,${color}30,transparent)` }} />
+      <span
+        className="font-black uppercase"
+        style={{ fontSize: 8, letterSpacing: '0.14em', color, padding: '3px 10px', background: color + '12', border: `1px solid ${color}25`, borderRadius: 99 }}
       >
-        {icon} {label}
-      </div>
-      <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg,transparent,${color}35)` }} />
+        {label}
+      </span>
+      <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg,transparent,${color}30)` }} />
     </div>
   )
 }
 
 /* ══════════════════════════════════════════════════════════════
-   Skeleton loader
+   Skeleton
 ══════════════════════════════════════════════════════════════ */
 function Skeleton() {
   return (
-    <div className="space-y-2 p-3">
-      {[80, 65, 72, 55, 68, 50, 60, 45].map((w, i) => (
+    <div className="space-y-2">
+      {[75, 85, 60, 70, 55, 65, 50].map((w, i) => (
         <div
           key={i}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}
+          className="flex items-center gap-3 px-3.5 rounded-2xl"
+          style={{ height: 56, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}
         >
-          <div className="w-8 h-4 rounded-md animate-pulse" style={{ background: 'rgba(255,255,255,0.05)' }} />
-          <div className="w-[34px] h-[34px] rounded-full animate-pulse flex-shrink-0" style={{ background: 'rgba(255,255,255,0.05)' }} />
+          <div className="w-7 h-4 rounded animate-pulse flex-shrink-0" style={{ background: 'rgba(255,255,255,0.05)' }} />
+          <div className="w-9 h-9 rounded-full animate-pulse flex-shrink-0" style={{ background: 'rgba(255,255,255,0.05)' }} />
           <div className="flex-1 space-y-1.5">
-            <div className="h-2.5 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.05)', width: `${w}%` }} />
-            <div className="h-2 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.03)', width: '35%' }} />
+            <div className="h-3 rounded animate-pulse" style={{ background: 'rgba(255,255,255,0.05)', width: `${w}%` }} />
+            <div className="h-2 rounded animate-pulse" style={{ background: 'rgba(255,255,255,0.03)', width: '35%' }} />
           </div>
-          <div className="w-10 h-4 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.05)' }} />
+          <div className="w-10 h-5 rounded animate-pulse flex-shrink-0" style={{ background: 'rgba(255,255,255,0.05)' }} />
         </div>
       ))}
     </div>
@@ -305,7 +290,7 @@ function Skeleton() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   Main Page
+   Main
 ══════════════════════════════════════════════════════════════ */
 export default function Leaderboard() {
   const user = useAuthStore(s => s.user)
@@ -323,17 +308,16 @@ export default function Leaderboard() {
   const daysLeft = Math.max(1, 7 - new Date().getDay())
 
   return (
-    <div className="max-w-[640px] mx-auto px-4 py-5">
+    <div className="max-w-[640px] mx-auto px-4 py-4">
 
-      {/* ── League selector strip ── */}
-      <div className="relative mb-5">
-        {/* Right fade hint */}
+      {/* ── League selector ── */}
+      <div className="relative mb-4">
         <div
-          className="absolute right-0 top-0 bottom-0 w-10 z-10 pointer-events-none"
+          className="absolute right-0 inset-y-0 w-8 z-10 pointer-events-none"
           style={{ background: 'linear-gradient(90deg,transparent,#0e1220)' }}
         />
         <div
-          className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
+          className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-0.5"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {LEAGUES.map(l => (
@@ -345,157 +329,79 @@ export default function Leaderboard() {
               onClick={() => setLeague(l.id)}
             />
           ))}
-          {/* Buffer so last item clears the fade */}
           <div className="w-4 flex-shrink-0" />
         </div>
       </div>
 
-      {/* ── Content — animated on league change ── */}
+      {/* ── Content — animates on league switch ── */}
       <AnimatePresence mode="wait">
         <motion.div
           key={league}
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8, scale: 0.99 }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0  }}
+          exit={{   opacity: 0          }}
+          transition={{ duration: 0.18 }}
         >
-          {/* ── Hero banner ── */}
-          <motion.div
-            className="rounded-2xl p-4 mb-4 relative overflow-hidden"
-            style={{
-              background: `linear-gradient(135deg,${lg.bg} 0%,${lg.bg}55 55%,#07090f 100%)`,
-              border: `1px solid ${lg.color}32`,
-              boxShadow: `0 0 40px ${lg.glowColor}, 0 8px 32px rgba(0,0,0,0.5)`,
-            }}
-          >
-            <div className="absolute inset-0 opacity-[0.03]" style={STRIPE} />
-            <div
-              className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl pointer-events-none"
-              style={{ background: lg.color, opacity: 0.1 }}
-            />
+          <LeagueHero lg={lg} myRank={myRank} me={me} daysLeft={daysLeft} />
 
-            {/* League identity row */}
-            <div className="relative flex items-center gap-3 mb-4">
-              <motion.div
-                animate={{
-                  boxShadow: [
-                    `0 0 14px ${lg.glowColor}`,
-                    `0 0 32px ${lg.glowColor}`,
-                    `0 0 14px ${lg.glowColor}`,
-                  ],
-                }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                style={{
-                  background: `${lg.color}16`,
-                  border: `1px solid ${lg.color}32`,
-                }}
-              >
-                {lg.emoji}
-              </motion.div>
-
-              <div className="flex-1 min-w-0">
-                <div
-                  className="font-black uppercase mb-0.5"
-                  style={{ fontSize: 8, letterSpacing: '0.12em', color: lg.color }}
-                >
-                  ЖУМАЛЫК РЕЙТИНГ
-                </div>
-                <div className="text-base font-black leading-tight text-white">
-                  {lg.name} ЛИГАСЫ
-                </div>
-                <div className="font-semibold mt-0.5" style={{ fontSize: 9, color: 'rgba(255,255,255,0.28)' }}>
-                  Жогорку 5 → кийинки лигага чыгат
-                </div>
-              </div>
-            </div>
-
-            {/* Stats row */}
-            <div className="relative grid grid-cols-3 gap-1.5">
-              {[
-                { v: myRank ? `#${myRank}` : '—',         label: 'ОРНУМ',    color: '#1CB0F6', icon: '📊' },
-                { v: (me?.weeklyXP ?? 0).toLocaleString(), label: 'ЖУМА XP',  color: '#58CC02', icon: '⭐' },
-                { v: `${daysLeft}`,                        label: 'КҮН КАЛДЫ',color: '#FF9600', icon: '⏰' },
-              ].map(({ v, label, color, icon }) => (
-                <div
-                  key={label}
-                  className="rounded-xl p-2 text-center"
-                  style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.06)' }}
-                >
-                  <div className="text-sm leading-none mb-0.5">{icon}</div>
-                  <div className="text-sm font-black leading-none mt-0.5" style={{ color }}>{v}</div>
-                  <div
-                    className="font-extrabold uppercase mt-1 leading-none"
-                    style={{ fontSize: 7, letterSpacing: '0.05em', color: 'rgba(255,255,255,0.2)' }}
-                  >
-                    {label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* ── Rank content ── */}
           {isLoading ? (
-            <div
-              className="rounded-2xl overflow-hidden"
-              style={{ background: '#0d1220', border: '1px solid rgba(255,255,255,0.06)' }}
-            >
-              <Skeleton />
-            </div>
+            <Skeleton />
           ) : entries.length === 0 ? (
             <div
-              className="rounded-2xl py-16 text-center"
-              style={{ background: '#0d1220', border: '1px solid rgba(255,255,255,0.06)' }}
+              className="rounded-2xl py-14 text-center"
+              style={{ background: '#0c1018', border: '1px solid rgba(255,255,255,0.06)' }}
             >
-              <div className="text-5xl mb-3">{lg.emoji}</div>
-              <div className="font-black text-base text-white mb-1">{lg.name} Лигасы</div>
-              <div className="text-sm" style={{ color: '#2d3448' }}>Азырынча оюнчулар жок</div>
+              <div style={{ fontSize: 44, marginBottom: 8 }}>{lg.emoji}</div>
+              <div className="font-black text-sm text-white">{lg.name} Лигасы</div>
+              <div style={{ fontSize: 12, color: '#2d3448', marginTop: 4 }}>Азырынча оюнчулар жок</div>
             </div>
           ) : (
             <>
-              {/* Podium */}
-              {entries.length >= 3 && <Podium top3={entries.slice(0, 3)} lg={lg} />}
+              {/* Top 3 spotlight */}
+              {entries.length >= 3 && <TopThree entries={entries.slice(0, 3)} />}
 
               {/* Full rank list */}
               <div
                 className="rounded-2xl overflow-hidden"
-                style={{ background: '#0d1220', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ background: '#0c1018', border: '1px solid rgba(255,255,255,0.07)' }}
               >
-                {/* List header */}
+                {/* Header */}
                 <div
-                  className="px-4 py-3 flex items-center gap-2.5"
+                  className="px-4 py-2.5 flex items-center gap-2"
                   style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
                 >
                   <span className="font-extrabold text-sm text-white">Рейтинг</span>
-                  <div
-                    className="px-2 py-0.5 rounded-full font-black"
+                  <span
+                    className="font-black rounded-full px-2 py-0.5"
                     style={{ fontSize: 10, background: 'rgba(255,255,255,0.05)', color: '#2d3448' }}
                   >
-                    {entries.length} оюнчу
-                  </div>
+                    {entries.length}
+                  </span>
                 </div>
 
-                <div className="p-2.5 space-y-1">
-                  <ZoneBadge color="#58CC02" icon="↑" label="ЖОГОРКУ ЗОН" />
+                <div className="p-2 space-y-1">
+                  {/* Top zone */}
+                  <Zone color="#58CC02" label="↑ Жогорку зон" />
                   {entries.slice(0, 5).map((e, i) => (
-                    <RankRow key={e.id || i} u={e} rank={i + 1} isMe={e.id === me?.id} idx={i} />
+                    <RankCard key={e.id || i} u={e} rank={i + 1} isMe={e.id === me?.id} idx={i} />
                   ))}
 
+                  {/* Middle zone */}
                   {entries.length > 5 && (
                     <>
-                      <ZoneBadge color="#7a859e" icon="↔" label="ОРТОҢКУ ЗОН" />
+                      <Zone color="#7a859e" label="↔ Ортоңку зон" />
                       {entries.slice(5, 8).map((e, i) => (
-                        <RankRow key={e.id || i} u={e} rank={i + 6} isMe={e.id === me?.id} idx={i + 5} />
+                        <RankCard key={e.id || i} u={e} rank={i + 6} isMe={e.id === me?.id} idx={i + 5} />
                       ))}
                     </>
                   )}
 
+                  {/* Bottom zone */}
                   {entries.length > 8 && (
                     <>
-                      <ZoneBadge color="#FF4B4B" icon="↓" label="АСТЫНКЫ ЗОН" />
+                      <Zone color="#FF4B4B" label="↓ Астынкы зон" />
                       {entries.slice(8).map((e, i) => (
-                        <RankRow key={e.id || i} u={e} rank={i + 9} isMe={e.id === me?.id} idx={i + 8} />
+                        <RankCard key={e.id || i} u={e} rank={i + 9} isMe={e.id === me?.id} idx={i + 8} />
                       ))}
                     </>
                   )}
