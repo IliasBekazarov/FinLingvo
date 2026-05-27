@@ -5,357 +5,371 @@ import api from '@/lib/api'
 import { LEAGUES } from '@/data/content'
 import { useAuthStore } from '@/store/authStore'
 
-/* ─── League Card ─────────────────────────────────────────── */
-function LeagueCard({ league, active, onClick, userLeague }) {
-  const isUser = league.id === userLeague
-  const W  = active ? 108 : 76
-  const H  = active ? 148 : 106
-  const FS = active ? 40  : 26
+const STRIPE = {
+  backgroundImage: 'repeating-linear-gradient(135deg,#fff 0,#fff 1px,transparent 0,transparent 50%)',
+  backgroundSize: '14px 14px',
+}
 
+/* ─── Compact league pill selector ───────────────────────── */
+function LeaguePill({ league, active, isUser, onClick }) {
   return (
     <motion.button
       onClick={onClick}
-      animate={{ width: W, height: H }}
-      whileTap={{ scale: 0.93 }}
-      transition={{ type: 'spring', stiffness: 360, damping: 32 }}
-      className="relative flex-shrink-0 flex flex-col items-center justify-center cursor-pointer overflow-hidden"
+      whileTap={{ scale: 0.9 }}
+      className="relative flex-shrink-0 flex flex-col items-center gap-1 px-2 py-2.5 rounded-2xl transition-all cursor-pointer"
       style={{
-        gap: 6,
-        borderRadius: 18,
-        border: `2px solid ${active ? league.color : 'rgba(255,255,255,0.07)'}`,
+        minWidth: active ? 68 : 52,
         background: active
-          ? `linear-gradient(145deg, ${league.bg} 0%, ${league.bg}bb 100%)`
-          : '#131826',
-        boxShadow: active
-          ? `0 0 22px ${league.glowColor}, 0 6px 20px rgba(0,0,0,0.5)`
-          : 'none',
+          ? `linear-gradient(145deg, ${league.bg}, ${league.bg}aa)`
+          : 'rgba(255,255,255,0.03)',
+        border: `2px solid ${active ? league.color : 'rgba(255,255,255,0.05)'}`,
+        boxShadow: active ? `0 0 18px ${league.glowColor}` : 'none',
       }}
     >
-      {/* User badge */}
       {isUser && (
-        <div style={{
-          position: 'absolute', top: 6, right: 6,
-          width: 15, height: 15, borderRadius: '50%',
-          background: '#58CC02',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '0.45rem', fontWeight: 900, color: '#fff',
-        }}>✓</div>
+        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full flex items-center justify-center"
+          style={{ background: '#58CC02', fontSize: '0.4rem', fontWeight: 900, color: '#fff' }}>
+          ✓
+        </div>
       )}
-
-      {/* Emoji */}
-      <motion.span
-        animate={{ fontSize: FS }}
-        transition={{ type: 'spring', stiffness: 360, damping: 32 }}
-        style={{ lineHeight: 1 }}
-      >
-        {league.emoji}
-      </motion.span>
-
-      {/* Name */}
-      <motion.div
-        animate={{ fontSize: active ? 11 : 9 }}
-        transition={{ type: 'spring', stiffness: 360, damping: 32 }}
+      <span style={{ fontSize: active ? 24 : 18, lineHeight: 1 }}>{league.emoji}</span>
+      <span
+        className="font-black leading-none"
         style={{
-          fontWeight: 900,
-          color: active ? league.color : '#7a859e',
-          letterSpacing: '0.06em',
-          lineHeight: 1.1,
-          textAlign: 'center',
-          padding: '0 4px',
+          fontSize: active ? 8 : 7,
+          color: active ? league.color : '#3d4860',
+          letterSpacing: '0.05em',
         }}
       >
         {league.name}
-      </motion.div>
-
-      {/* Min XP */}
-      <div style={{ fontSize: 8, fontWeight: 700, color: '#3d4860' }}>
-        {league.minXP}+ XP
-      </div>
+      </span>
     </motion.button>
   )
 }
 
-/* ─── Avatar ─────────────────────────────────────────────── */
-function Avatar({ emoji, size = 42, gold = false }) {
+/* ─── Avatar ──────────────────────────────────────────────── */
+function Avatar({ emoji, size = 42, medal }) {
+  const medalColors = { 1: '#FFD700', 2: '#C0C0C0', 3: '#CD7F32' }
+  const color = medalColors[medal]
   return (
-    <div
-      className="rounded-full bg-gradient-to-br from-[#162240] to-[#0b1628] flex items-center justify-center flex-shrink-0"
-      style={{
-        width: size, height: size, fontSize: size * 0.48,
-        border: gold ? '2.5px solid #FFD700' : '1.5px solid rgba(255,255,255,0.1)',
-        boxShadow: gold ? '0 0 18px rgba(255,215,0,0.35)' : 'none',
-      }}
-    >
-      {emoji || '👤'}
+    <div className="relative flex-shrink-0">
+      <div
+        className="rounded-full flex items-center justify-center"
+        style={{
+          width: size, height: size, fontSize: size * 0.46,
+          background: 'linear-gradient(135deg,#162240,#0b1628)',
+          border: `${medal ? 2.5 : 1.5}px solid ${color || 'rgba(255,255,255,0.1)'}`,
+          boxShadow: color ? `0 0 16px ${color}60` : 'none',
+        }}
+      >
+        {emoji || '👤'}
+      </div>
+      {medal === 1 && (
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-base leading-none">👑</div>
+      )}
     </div>
   )
 }
 
-/* ─── Podium ─────────────────────────────────────────────── */
+/* ─── Podium ──────────────────────────────────────────────── */
 function Podium({ top3, lg }) {
   if (top3.length < 3) return null
-  const order   = [top3[1], top3[0], top3[2]]
-  const sizes   = [52, 66, 44]
-  const heights = [52, 72, 40]
-  const labels  = ['🥈', '🥇', '🥉']
-
-  return (
-    <div className="bg-card border border-soft rounded-2xl overflow-hidden mb-4">
-      <div className="px-4 py-2.5 border-b border-soft font-extrabold text-sm flex items-center gap-2">
-        <span style={{ fontSize: 20 }}>{lg?.emoji}</span>
-        Топ 3
-      </div>
-      <div className="flex items-end justify-center gap-3 sm:gap-5 px-4 pt-5 pb-3">
-        {order.map((u, pi) => u ? (
-          <motion.div
-            key={pi}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: pi * 0.12 }}
-            className="flex flex-col items-center gap-1"
-          >
-            <Avatar emoji={u.avatar} size={sizes[pi]} gold={pi === 1} />
-            <div className="text-xs font-extrabold max-w-[64px] text-center truncate">{u.name}</div>
-            <div className="text-[0.58rem] text-t2 font-bold">{(u.weeklyXP||0).toLocaleString()} XP</div>
-            <div
-              className="rounded-t-xl flex items-center justify-center text-xl"
-              style={{
-                width: 68, height: heights[pi],
-                background: pi === 1
-                  ? 'linear-gradient(180deg,rgba(255,215,0,0.18),rgba(255,215,0,0.06))'
-                  : pi === 0
-                  ? 'linear-gradient(180deg,rgba(192,192,192,0.15),rgba(192,192,192,0.05))'
-                  : 'linear-gradient(180deg,rgba(205,127,50,0.15),rgba(205,127,50,0.05))',
-                border: '1px solid rgba(255,255,255,0.07)',
-                borderBottom: 'none',
-              }}
-            >
-              {labels[pi]}
-            </div>
-          </motion.div>
-        ) : null)}
-      </div>
-    </div>
-  )
-}
-
-/* ─── Row ────────────────────────────────────────────────── */
-function Row({ u, rank, isMe, idx }) {
-  const medals     = { 1: '🥇', 2: '🥈', 3: '🥉' }
-  const rankColors = { 1: '#FFD700', 2: '#C0C0C0', 3: '#CD7F32' }
+  // order: 2nd, 1st, 3rd
+  const slots = [
+    { user: top3[1], rank: 2, height: 56,  avatarSize: 52, bg: 'rgba(192,192,192,0.15)', border: 'rgba(192,192,192,0.3)', label: '2' },
+    { user: top3[0], rank: 1, height: 80,  avatarSize: 64, bg: 'rgba(255,215,0,0.15)',   border: 'rgba(255,215,0,0.4)',   label: '1' },
+    { user: top3[2], rank: 3, height: 40,  avatarSize: 44, bg: 'rgba(205,127,50,0.15)',  border: 'rgba(205,127,50,0.3)', label: '3' },
+  ]
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -14 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: idx * 0.035 }}
-      className={`flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3 py-2.5 rounded-xl border transition-all ${
-        isMe        ? 'border-blue/40 bg-blue/5'
-        : rank <= 3 ? 'border-yellow/15 bg-transparent'
-        :             'border-soft bg-transparent'
-      }`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 }}
+      className="rounded-2xl overflow-hidden mb-4 relative"
+      style={{ background: '#131826', border: '1px solid rgba(255,255,255,0.06)' }}
     >
-      <div className="w-7 sm:w-8 text-center font-black text-sm flex-shrink-0"
-        style={{ color: rankColors[rank] || '#3d4860' }}>
-        {medals[rank] || `#${rank}`}
+      <div className="px-4 py-2.5 border-b border-soft flex items-center gap-2"
+        style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+        <span style={{ fontSize: 18 }}>{lg?.emoji}</span>
+        <span className="font-extrabold text-sm">Топ 3</span>
+        <span className="ml-auto text-[0.6rem] font-bold text-t3">Жуманын лидерлери</span>
       </div>
-      <Avatar emoji={u.avatar} size={36} />
-      <div className="flex-1 min-w-0">
-        <div className="font-bold text-sm truncate">
-          {u.name}
-          {isMe && <span className="ml-1.5 text-blue text-[0.62rem] font-extrabold">(Сен)</span>}
-        </div>
-        <div className="text-orange text-xs font-bold mt-0.5">🔥 {u.streak || 0} күн</div>
-      </div>
-      <div className="gradient-text-green font-black text-sm flex-shrink-0">
-        {(u.weeklyXP || 0).toLocaleString()} XP
+
+      <div className="flex items-end justify-center gap-2 px-4 pt-6 pb-0">
+        {slots.map(({ user: u, rank, height, avatarSize, bg, border, label }, pi) => (
+          <motion.div
+            key={rank}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: pi * 0.1 + 0.2, type: 'spring', stiffness: 200, damping: 20 }}
+            className="flex flex-col items-center flex-1"
+            style={{ maxWidth: 100 }}
+          >
+            <Avatar emoji={u?.avatar} size={avatarSize} medal={rank} />
+            <div className="mt-1.5 text-xs font-extrabold max-w-[72px] text-center truncate">{u?.name}</div>
+            <div className="text-[0.58rem] text-t2 font-bold mb-2">
+              {(u?.weeklyXP || 0).toLocaleString()} XP
+            </div>
+            {/* Podium bar */}
+            <motion.div
+              initial={{ height: 0 }}
+              animate={{ height }}
+              transition={{ delay: pi * 0.1 + 0.4, duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+              className="w-full rounded-t-2xl flex items-start justify-center pt-2 font-black text-lg relative overflow-hidden"
+              style={{ background: bg, border: `1px solid ${border}`, borderBottom: 'none' }}
+            >
+              <div className="absolute inset-0 opacity-[0.04]" style={STRIPE} />
+              <span className="relative" style={{ color: border, fontSize: 20 }}>
+                {rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}
+              </span>
+            </motion.div>
+          </motion.div>
+        ))}
       </div>
     </motion.div>
   )
 }
 
-function ZoneLabel({ color, children }) {
+/* ─── Rank row ────────────────────────────────────────────── */
+function RankRow({ u, rank, isMe, idx }) {
+  const medals = { 1: '🥇', 2: '🥈', 3: '🥉' }
+  const accentColors = { 1: '#FFD700', 2: '#C0C0C0', 3: '#CD7F32' }
+  const accent = accentColors[rank]
+
   return (
-    <div className="text-[0.58rem] font-black tracking-[2px] uppercase py-1.5 px-1"
-      style={{ color }}>
-      {children}
+    <motion.div
+      initial={{ opacity: 0, x: -16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: idx * 0.03, type: 'spring', stiffness: 300, damping: 28 }}
+      className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl relative overflow-hidden"
+      style={{
+        background: isMe ? 'rgba(28,176,246,0.07)' : rank <= 3 ? `${accentColors[rank]}08` : 'transparent',
+        border: `1px solid ${isMe ? 'rgba(28,176,246,0.3)' : rank <= 3 ? `${accent}20` : 'rgba(255,255,255,0.05)'}`,
+      }}
+    >
+      {/* Left accent bar for top 3 */}
+      {rank <= 3 && (
+        <div className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full"
+          style={{ background: accent }} />
+      )}
+      {isMe && (
+        <div className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full"
+          style={{ background: '#1CB0F6' }} />
+      )}
+
+      {/* Rank */}
+      <div className="w-7 text-center font-black text-sm flex-shrink-0"
+        style={{ color: accentColors[rank] || '#3d4860' }}>
+        {medals[rank] || <span className="text-xs font-bold" style={{ color: '#3d4860' }}>#{rank}</span>}
+      </div>
+
+      <Avatar emoji={u.avatar} size={34} medal={rank <= 3 ? rank : null} />
+
+      <div className="flex-1 min-w-0">
+        <div className="font-bold text-sm truncate flex items-center gap-1.5">
+          {u.name}
+          {isMe && (
+            <span className="px-1.5 py-0.5 rounded-full text-[0.55rem] font-black"
+              style={{ background: 'rgba(28,176,246,0.15)', color: '#1CB0F6' }}>
+              СЕН
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-[0.6rem] font-bold text-orange">🔥 {u.streak || 0}</span>
+        </div>
+      </div>
+
+      <div className="text-right flex-shrink-0">
+        <div className="font-black text-sm gradient-text-green">
+          {(u.weeklyXP || 0).toLocaleString()}
+        </div>
+        <div className="text-[0.58rem] text-t3 font-bold">XP</div>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ─── Zone separator ──────────────────────────────────────── */
+function ZoneBadge({ color, icon, children }) {
+  return (
+    <div className="flex items-center gap-2 my-2 px-1">
+      <div className="flex-1 h-px" style={{ background: `${color}30` }} />
+      <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.58rem] font-black tracking-wider uppercase"
+        style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>
+        {icon} {children}
+      </div>
+      <div className="flex-1 h-px" style={{ background: `${color}30` }} />
     </div>
   )
 }
 
-/* ─── Main ───────────────────────────────────────────────── */
+/* ─── Skeleton loader ─────────────────────────────────────── */
+function Skeleton() {
+  return (
+    <div className="space-y-2">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)' }}>
+          <div className="w-7 h-5 rounded-md animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="w-9 h-9 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="flex-1 space-y-1.5">
+            <div className="h-3 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)', width: `${50 + i * 5}%` }} />
+            <div className="h-2 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.04)', width: '40%' }} />
+          </div>
+          <div className="w-12 h-4 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* ─── Main page ───────────────────────────────────────────── */
 export default function Leaderboard() {
-  const user   = useAuthStore(s => s.user)
+  const user       = useAuthStore(s => s.user)
   const [league, setLeague] = useState(user?.league || 'bronze')
+
   const { data, isLoading } = useQuery({
     queryKey: ['leaderboard', league],
     queryFn:  () => api.get(`/leaderboard?league=${league}`),
   })
 
-  const entries  = data?.entries || []
-  const me       = data?.me
-  const myRank   = entries.findIndex(e => e.id === me?.id) + 1
-  const lg       = LEAGUES.find(l => l.id === league) || LEAGUES[0]
+  const entries   = data?.entries || []
+  const me        = data?.me
+  const myRank    = entries.findIndex(e => e.id === me?.id) + 1
+  const lg        = LEAGUES.find(l => l.id === league) || LEAGUES[0]
   const activeIdx = LEAGUES.findIndex(l => l.id === league)
-  const daysLeft = Math.max(1, 7 - new Date().getDay())
-
-  function handleArrow() {
-    const nextIdx = (activeIdx + 1) % LEAGUES.length
-    setLeague(LEAGUES[nextIdx].id)
-  }
+  const daysLeft  = Math.max(1, 7 - new Date().getDay())
 
   return (
     <div className="max-w-[640px] mx-auto px-4 py-5">
 
-      {/* Header */}
-      <h2 className="text-base font-black text-t2 tracking-wider mb-4">
-        БАРДЫК ЛИГАЛАР
-      </h2>
-
-      {/* League cards carousel */}
-      <div className="mb-2">
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 snap-x snap-mandatory">
-          {LEAGUES.map(l => (
-            <div key={l.id} className="snap-start flex-shrink-0">
-              <LeagueCard
-                league={l}
-                active={league === l.id}
-                userLeague={user?.league}
-                onClick={() => setLeague(l.id)}
-              />
-            </div>
-          ))}
-
-          {/* Arrow — next league */}
-          <button
-            onClick={handleArrow}
-            className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center ml-1 transition-all active:scale-90 hover:bg-white/10"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-          </button>
-        </div>
-
-        {/* Dots */}
-        <div className="flex justify-center gap-1.5 mt-3">
-          {LEAGUES.map((l, i) => (
-            <motion.div
-              key={l.id}
-              onClick={() => setLeague(l.id)}
-              animate={{ width: i === activeIdx ? 20 : 6 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="h-1.5 rounded-full cursor-pointer"
-              style={{ background: i === activeIdx ? lg.color : 'rgba(255,255,255,0.14)' }}
-            />
-          ))}
-        </div>
+      {/* ── League selector strip ── */}
+      <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-2 mb-5">
+        {LEAGUES.map(l => (
+          <LeaguePill
+            key={l.id}
+            league={l}
+            active={league === l.id}
+            isUser={l.id === user?.league}
+            onClick={() => setLeague(l.id)}
+          />
+        ))}
       </div>
 
-      {/* League detail */}
+      {/* ── Active league section (animated on change) ── */}
       <AnimatePresence mode="wait">
         <motion.div
           key={league}
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.25 }}
-          className="mt-5"
+          exit={{ opacity: 0, y: -10, scale: 0.98 }}
+          transition={{ duration: 0.22 }}
         >
-          {/* League header card */}
-          <div
-            className="rounded-2xl p-4 sm:p-5 mb-5 relative overflow-hidden border"
+          {/* League hero banner */}
+          <motion.div
+            className="rounded-2xl p-4 mb-4 relative overflow-hidden"
             style={{
-              background: `linear-gradient(135deg, ${lg.bg}, #0a0d18)`,
-              borderColor: `${lg.color}40`,
-              boxShadow: `0 0 36px ${lg.glowColor}`,
+              background: `linear-gradient(135deg, ${lg.bg} 0%, ${lg.bg}88 50%, #0a0d18 100%)`,
+              border: `1px solid ${lg.color}35`,
+              boxShadow: `0 0 40px ${lg.glowColor}, 0 8px 32px rgba(0,0,0,0.4)`,
             }}
           >
-            {/* Texture */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{
-              backgroundImage: 'repeating-linear-gradient(135deg,#fff 0,#fff 1px,transparent 0,transparent 50%)',
-              backgroundSize: '14px 14px',
-            }}/>
+            <div className="absolute inset-0 opacity-[0.035]" style={STRIPE} />
 
-            <div className="relative flex items-center gap-3 sm:gap-4">
-              <div
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
+            {/* Top row: emoji + title */}
+            <div className="relative flex items-center gap-3 mb-4">
+              <motion.div
+                animate={{ scale: [1, 1.08, 1] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
                 style={{
-                  fontSize: 32,
-                  background: `${lg.color}18`,
-                  boxShadow: `0 0 22px ${lg.glowColor}`,
+                  background: `${lg.color}20`,
+                  border: `1px solid ${lg.color}30`,
+                  boxShadow: `0 0 24px ${lg.glowColor}`,
                 }}
               >
                 {lg.emoji}
-              </div>
+              </motion.div>
               <div className="flex-1 min-w-0">
-                <div className="text-[0.6rem] font-black tracking-[3px] uppercase mb-0.5"
-                  style={{ color: lg.color }}>
-                  ЖУМАЛЫК РЕЙТИНГ
+                <div className="text-[0.58rem] font-black tracking-[3px] uppercase"
+                  style={{ color: lg.color }}>ЖУМАЛЫК РЕЙТИНГ</div>
+                <div className="text-xl font-black leading-tight">{lg.name} ЛИГАСЫ</div>
+                <div className="text-t3 text-[0.65rem] font-semibold mt-0.5">
+                  Жогорку 5 — кийинки лигага
                 </div>
-                <div className="text-xl sm:text-2xl font-black">{lg.name} ЛИГАСЫ</div>
-                <div className="text-t2 text-xs font-semibold mt-0.5">Эң жогорку 5 жогорулайт</div>
               </div>
             </div>
 
-            {/* Stats row */}
-            <div className="flex gap-2 sm:gap-4 mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            {/* Stats */}
+            <div className="relative grid grid-cols-3 gap-2">
               {[
-                { val: myRank ? `#${myRank}` : '—', label: 'МЕНИН ОРНУМ', color: '#1CB0F6' },
-                { val: me?.weeklyXP ?? 0,            label: 'ЖУМАЛЫК XP',  color: '#58CC02' },
-                { val: daysLeft,                      label: 'КҮН КАЛДЫ',   color: '#FF9600' },
-              ].map(({ val, label, color }) => (
-                <div key={label} className="text-center flex-1">
-                  <div className="text-lg sm:text-xl font-black" style={{ color }}>{val}</div>
-                  <div className="text-[0.56rem] font-extrabold tracking-wider" style={{ color: '#3d4860' }}>{label}</div>
+                { val: myRank ? `#${myRank}` : '—', label: 'ОРНУМ',    color: '#1CB0F6', icon: '📊' },
+                { val: (me?.weeklyXP ?? 0).toLocaleString(), label: 'ЖУМА XP', color: '#58CC02', icon: '⭐' },
+                { val: daysLeft,  label: 'КҮН КАЛДЫ', color: '#FF9600', icon: '⏰' },
+              ].map(({ val, label, color, icon }) => (
+                <div key={label}
+                  className="rounded-xl p-2.5 text-center"
+                  style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div className="text-base mb-0.5">{icon}</div>
+                  <div className="text-lg font-black leading-none" style={{ color }}>{val}</div>
+                  <div className="text-[0.55rem] font-extrabold tracking-wider mt-1"
+                    style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</div>
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
-          {/* List */}
+          {/* Content */}
           {isLoading ? (
-            <div className="flex justify-center py-14">
-              <div className="w-10 h-10 border-[3px] border-card3 border-t-blue rounded-full animate-spin-slow" />
+            <div className="bg-card border border-soft rounded-2xl p-3">
+              <Skeleton />
+            </div>
+          ) : entries.length === 0 ? (
+            <div className="bg-card border border-soft rounded-2xl py-16 text-center">
+              <div className="text-4xl mb-3">{lg.emoji}</div>
+              <div className="font-black text-base mb-1">{lg.name} Лигасы</div>
+              <div className="text-t3 text-sm">Азырынча колдонуучулар жок</div>
             </div>
           ) : (
             <>
               {entries.length >= 3 && <Podium top3={entries.slice(0, 3)} lg={lg} />}
 
-              <div className="bg-card border border-soft rounded-2xl overflow-hidden">
-                <div className="px-4 py-2.5 border-b border-soft font-extrabold text-sm flex items-center gap-2">
-                  📋 Рейтинг
-                  <span className="ml-auto text-[0.6rem] text-t3 font-bold">{entries.length} колдонуучу</span>
+              <div className="bg-card rounded-2xl overflow-hidden"
+                style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="px-4 py-2.5 flex items-center gap-2"
+                  style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <span className="font-extrabold text-sm">Рейтинг тизмеси</span>
+                  <span className="ml-auto px-2 py-0.5 rounded-full text-[0.6rem] font-black"
+                    style={{ background: 'rgba(255,255,255,0.06)', color: '#7a859e' }}>
+                    {entries.length} оюнчу
+                  </span>
                 </div>
-                <div className="p-2.5 sm:p-3 space-y-1.5">
-                  {entries.length === 0 ? (
-                    <div className="text-center py-8 text-t3 font-semibold text-sm">
-                      Бул лигада колдонуучулар жок
-                    </div>
-                  ) : (
+
+                <div className="p-2.5 space-y-1">
+                  {entries.length > 0 && (
+                    <ZoneBadge color="#58CC02" icon="↑">Жогорку зон</ZoneBadge>
+                  )}
+                  {entries.slice(0, 5).map((e, i) => (
+                    <RankRow key={e.id || i} u={e} rank={i+1} isMe={e.id === me?.id} idx={i} />
+                  ))}
+
+                  {entries.length > 5 && (
                     <>
-                      <ZoneLabel color="#58CC02">↑ ЖОГОРКУ ЗОН — КӨТӨРҮЛҮҮ</ZoneLabel>
-                      {entries.slice(0, 5).map((e, i) => (
-                        <Row key={e.id || i} u={e} rank={i+1} isMe={e.id === me?.id} idx={i} />
+                      <ZoneBadge color="#7a859e" icon="↔">Ортоңку зон</ZoneBadge>
+                      {entries.slice(5, 8).map((e, i) => (
+                        <RankRow key={e.id || i} u={e} rank={i+6} isMe={e.id === me?.id} idx={i+5} />
                       ))}
-                      {entries.length > 5 && (
-                        <>
-                          <ZoneLabel color="#7a859e">ОРТОҢКУ ЗОН</ZoneLabel>
-                          {entries.slice(5, 8).map((e, i) => (
-                            <Row key={e.id || i} u={e} rank={i+6} isMe={e.id === me?.id} idx={i+5} />
-                          ))}
-                        </>
-                      )}
-                      {entries.length > 8 && (
-                        <>
-                          <ZoneLabel color="#FF4B4B">↓ АСТЫНКЫ ЗОН — ТҮШҮҮ</ZoneLabel>
-                          {entries.slice(8).map((e, i) => (
-                            <Row key={e.id || i} u={e} rank={i+9} isMe={e.id === me?.id} idx={i+8} />
-                          ))}
-                        </>
-                      )}
+                    </>
+                  )}
+
+                  {entries.length > 8 && (
+                    <>
+                      <ZoneBadge color="#FF4B4B" icon="↓">Астынкы зон</ZoneBadge>
+                      {entries.slice(8).map((e, i) => (
+                        <RankRow key={e.id || i} u={e} rank={i+9} isMe={e.id === me?.id} idx={i+8} />
+                      ))}
                     </>
                   )}
                 </div>
