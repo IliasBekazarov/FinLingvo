@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useAuthStore } from '@/store/authStore'
 import { LEAGUES } from '@/data/content'
 
@@ -59,35 +59,16 @@ function NavIcon({ id, active }) {
 function levelOf(xp) { return Math.max(1, Math.floor(Math.sqrt(xp / 100)) + 1) }
 function xpForLevel(lvl) { return Math.pow(lvl - 1, 2) * 100 }
 
-/* ── Main export ──────────────────────────────────────────── */
-export default function Sidebar({ open, onClose }) {
+/* ── Main export — desktop only, no mobile slide-in ──────── */
+export default function Sidebar() {
   const user   = useAuthStore(s => s.user)
   const league = LEAGUES?.find(l => l.id === user?.league) || LEAGUES?.[0]
 
   return (
-    <>
-      {/* Desktop */}
-      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-[240px] flex-col z-[200]"
-        style={{ background: '#0e1220', borderRight: '1px solid rgba(255,255,255,0.05)' }}>
-        <SidebarContent user={user} league={league} />
-      </aside>
-
-      {/* Mobile slide-in */}
-      <AnimatePresence>
-        {open && (
-          <motion.aside
-            initial={{ x: -260 }}
-            animate={{ x: 0 }}
-            exit={{ x: -260 }}
-            transition={{ type: 'spring', stiffness: 340, damping: 34 }}
-            className="fixed left-0 top-0 bottom-0 w-[240px] flex flex-col z-[200] md:hidden"
-            style={{ background: '#0e1220', borderRight: '1px solid rgba(255,255,255,0.05)' }}
-          >
-            <SidebarContent user={user} league={league} onClose={onClose} />
-          </motion.aside>
-        )}
-      </AnimatePresence>
-    </>
+    <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-[240px] flex-col z-[200]"
+      style={{ background: '#0e1220', borderRight: '1px solid rgba(255,255,255,0.05)' }}>
+      <SidebarContent user={user} league={league} />
+    </aside>
   )
 }
 

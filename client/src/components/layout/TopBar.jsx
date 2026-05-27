@@ -3,10 +3,11 @@ import { useAuthStore } from '@/store/authStore'
 import api from '@/lib/api'
 import { useEffect } from 'react'
 
-export default function TopBar({ onMenuClick }) {
+export default function TopBar() {
   const user    = useAuthStore(s => s.user)
   const setUser = useAuthStore(s => s.setUser)
 
+  // Refill hearts every 2 min in background
   useEffect(() => {
     const t = setInterval(async () => {
       try {
@@ -19,7 +20,7 @@ export default function TopBar({ onMenuClick }) {
 
   return (
     <div
-      className="sticky top-0 z-[100] flex items-center gap-1.5 px-3 py-2"
+      className="sticky top-0 z-[100] flex items-center justify-end gap-1.5 px-3 py-2"
       style={{
         background: 'rgba(14,18,32,0.92)',
         backdropFilter: 'blur(20px)',
@@ -28,22 +29,6 @@ export default function TopBar({ onMenuClick }) {
         minHeight: 48,
       }}
     >
-      {/* Hamburger */}
-      <button
-        onClick={onMenuClick}
-        className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-white/5 active:scale-90 flex-shrink-0"
-        style={{ color: '#7a859e' }}
-      >
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <line x1="3" y1="12" x2="21" y2="12"/>
-          <line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-
-      <div className="flex-1" />
-
       {/* Streak */}
       <Pill
         value={user?.streak ?? 0}
@@ -72,7 +57,7 @@ export default function TopBar({ onMenuClick }) {
         }
       />
 
-      {/* Hearts — compact on mobile */}
+      {/* Hearts */}
       <Hearts hearts={user?.hearts ?? 5} max={user?.maxHearts ?? 5} />
     </div>
   )
