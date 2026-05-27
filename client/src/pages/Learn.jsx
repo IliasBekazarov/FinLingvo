@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '@/store/authStore'
 import { useLessonStore } from '@/store/lessonStore'
@@ -36,9 +35,10 @@ function LockIcon({ size }) {
   )
 }
 
-/* ─── Single lesson node ────────────────────────────────────── */
-function Node({ lesson, mod, state, onClick, posIdx }) {
-  const [tip, setTip] = useState(false)
+/* ─── Single lesson node ─────────────────────────────────────
+   No hover tooltip — shows lesson meta below label (mobile-safe)
+─────────────────────────────────────────────────────────────── */
+function Node({ lesson, state, onClick, posIdx }) {
   const sz  = SIZES[Math.min(posIdx, 2)]
   const pos = POS[posIdx % 3]
 
@@ -59,17 +59,13 @@ function Node({ lesson, mod, state, onClick, posIdx }) {
     }
 
   return (
-    <div className={`relative flex flex-col items-center gap-2 ${pos}`}
-      onMouseEnter={() => setTip(true)}
-      onMouseLeave={() => setTip(false)}
-    >
-      {/* ── Node button ── */}
+    <div className={`relative flex flex-col items-center gap-1.5 ${pos}`}>
+      {/* Node button */}
       <motion.button
-        whileHover={state !== 'locked' ? { scale: 1.1 } : {}}
-        whileTap={state !== 'locked' ? { scale: 0.93 } : {}}
+        whileTap={state !== 'locked' ? { scale: 0.91 } : {}}
         onClick={onClick}
-        className={`rounded-full flex items-center justify-center relative transition-none ${sz.cls} ${
-          state === 'current' ? 'animate-pulse-blue' :
+        className={`rounded-full flex items-center justify-center relative ${sz.cls} ${
+          state === 'current'   ? 'animate-pulse-blue'  :
           state === 'completed' ? 'animate-pulse-green' : ''
         }`}
         style={style}
@@ -81,48 +77,23 @@ function Node({ lesson, mod, state, onClick, posIdx }) {
         )}
       </motion.button>
 
-      {/* ── Label ── */}
-      <div className={`text-center text-xs font-bold leading-tight max-w-[84px] transition-colors ${
-        state === 'current' ? 'text-white' :
-        state === 'completed' ? 'text-green' : 'text-t3'
+      {/* Label */}
+      <div className={`text-center text-xs font-bold leading-tight max-w-[84px] ${
+        state === 'current'   ? 'text-white'  :
+        state === 'completed' ? 'text-green'  : 'text-t3'
       }`}>
         {lesson.title}
       </div>
 
-      {/* ── Tooltip ── */}
-      <AnimatePresence>
-        {tip && (
-          <motion.div
-            initial={{ opacity: 0, y: 6, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-52 z-30 pointer-events-none"
-            style={{
-              background: '#141c30',
-              border: `1px solid ${state === 'current' ? '#1CB0F620' : state === 'completed' ? '#58CC0220' : 'rgba(255,255,255,0.06)'}`,
-              borderRadius: 16,
-              padding: '12px 14px',
-              boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
-            }}
-          >
-            <div className="font-black text-sm mb-1">{lesson.title}</div>
-            <div className="text-t2 text-xs font-semibold">
-              {state === 'completed' ? '✅ Аяктадың!' :
-               state === 'current'   ? `${lesson.questions.length} суроо · +${lesson.xpReward} XP · +${lesson.gemReward} 💎` :
-                                       '🔒 Алдыңкы сабакты аяктаңыз'}
-            </div>
-            {/* caret */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
-              <div className="w-3 h-3 rotate-45" style={{
-                background: '#141c30',
-                borderRight: '1px solid rgba(255,255,255,0.06)',
-                borderBottom: '1px solid rgba(255,255,255,0.06)',
-              }} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Always-visible lesson meta (replaces hover tooltip — works on mobile) */}
+      {state !== 'locked' && (
+        <div className="text-center" style={{ fontSize: 9, color: '#3d4860', lineHeight: 1.3 }}>
+          {state === 'completed'
+            ? <span style={{ color: '#58CC0280' }}>✓ Аяктадың</span>
+            : `${lesson.questions?.length ?? 0} суроо · +${lesson.xpReward} XP`
+          }
+        </div>
+      )}
     </div>
   )
 }
@@ -140,58 +111,51 @@ function Connector({ done }) {
   )
 }
 
-/* ─── Module header ─────────────────────────────────────────── */
-const HDR_BG     = 'linear-gradient(135deg,rgba(28,176,246,0.14) 0%,rgba(28,176,246,0.06) 100%)'
-const HDR_BORDER = 'rgba(28,176,246,0.22)'
-const HDR_COLOR  = '#1CB0F6'
-const HDR_ICON   = 'rgba(28,176,246,0.18)'
-
+/* ─── Module header — uses each module's own color ─────────── */
 function ModuleHeader({ mod, mIdx, done, total }) {
   const pct = total ? Math.round((done / total) * 100) : 0
+  const c   = mod.color || '#1CB0F6'
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: mIdx * 0.05, duration: 0.28 }}
-      className="flex items-center gap-3 rounded-2xl p-4 mb-6 relative overflow-hidden"
-      style={{ background: HDR_BG, border: `1px solid ${HDR_BORDER}` }}
+      transition={{ delay: mIdx * 0.04, duration: 0.26 }}
+      className="flex items-center gap-3 rounded-2xl p-4 mb-5 relative overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg,${c}18 0%,${c}08 100%)`,
+        border: `1px solid ${c}30`,
+      }}
     >
-      {/* stripe texture */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{
+      <div className="absolute inset-0 opacity-[0.025]" style={{
         backgroundImage: 'repeating-linear-gradient(135deg,#fff 0,#fff 1px,transparent 0,transparent 50%)',
         backgroundSize: '18px 18px',
       }} />
 
-      {/* Icon */}
       <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 relative"
-        style={{ background: HDR_ICON }}>
+        style={{ background: c + '20' }}>
         {mod.emoji}
       </div>
 
-      {/* Title */}
       <div className="flex-1 min-w-0 relative">
-        <div className="text-[0.6rem] font-black tracking-[2.5px] uppercase mb-0.5"
-          style={{ color: HDR_COLOR }}>
+        <div className="font-black uppercase mb-0.5"
+          style={{ fontSize: 9, letterSpacing: '0.14em', color: c }}>
           {mIdx + 1}-БӨЛҮМ
         </div>
-        <div className="font-black text-[0.95rem] leading-snug truncate">{mod.title}</div>
-
-        {/* Progress bar */}
-        <div className="mt-2 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.07)' }}>
+        <div className="font-black text-sm leading-snug truncate">{mod.title}</div>
+        <div className="mt-1.5 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.07)' }}>
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
-            transition={{ duration: 0.9, ease: 'easeOut', delay: mIdx * 0.08 }}
+            transition={{ duration: 0.8, ease: 'easeOut', delay: mIdx * 0.06 }}
             className="h-full rounded-full"
-            style={{ background: HDR_COLOR }}
+            style={{ background: c }}
           />
         </div>
       </div>
 
-      {/* Progress count */}
       <div className="text-right flex-shrink-0 relative">
-        <div className="text-lg font-black leading-none" style={{ color: HDR_COLOR }}>{done}/{total}</div>
-        <div className="text-xs font-bold mt-0.5" style={{ color: 'rgba(28,176,246,0.5)' }}>{pct}%</div>
+        <div className="text-lg font-black leading-none" style={{ color: c }}>{done}/{total}</div>
+        <div className="font-bold mt-0.5" style={{ fontSize: 10, color: c + '60' }}>{pct}%</div>
       </div>
     </motion.div>
   )
@@ -261,7 +225,6 @@ export default function Learn() {
                     >
                       <Node
                         lesson={lesson}
-                        mod={mod}
                         state={state}
                         posIdx={lIdx}
                         onClick={() => startLesson(lesson, mod, unlocked)}

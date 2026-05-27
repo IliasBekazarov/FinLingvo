@@ -163,25 +163,27 @@ export default function Profile() {
         <div className="px-4 py-2.5 border-b border-soft text-[0.62rem] font-black tracking-[2.5px] uppercase text-t3">
           Жетишкендиктер
         </div>
-        <div className="p-3 sm:p-4 grid grid-cols-4 sm:grid-cols-5 gap-2">
+        <div className="p-3 sm:p-4 grid grid-cols-3 sm:grid-cols-5 gap-2">
           {ACHIEVEMENTS?.map(a => {
             const earned = achievements.some(u => u.achievementId === a.id)
             return (
               <div
                 key={a.id}
-                title={a.description}
-                className={`rounded-xl p-2 sm:p-2.5 text-center border transition-all cursor-help ${
-                  earned
-                    ? 'hover:border-yellow/50'
-                    : 'opacity-30 grayscale'
+                className={`rounded-xl p-2.5 text-center border transition-all ${
+                  earned ? 'active:scale-95' : 'opacity-30 grayscale'
                 }`}
                 style={{
-                  borderColor: earned ? 'rgba(255,217,0,0.3)' : 'rgba(255,255,255,0.06)',
-                  background:  earned ? 'rgba(255,217,0,0.07)' : 'transparent',
+                  borderColor: earned ? 'rgba(255,217,0,0.28)' : 'rgba(255,255,255,0.06)',
+                  background:  earned ? 'rgba(255,217,0,0.07)'  : 'transparent',
                 }}
               >
-                <div className="text-xl sm:text-2xl mb-1">{a.icon}</div>
-                <div className="text-[0.5rem] sm:text-[0.55rem] text-t2 font-bold leading-tight">{a.title}</div>
+                <div className="text-2xl sm:text-3xl mb-1">{a.icon}</div>
+                <div className="text-[0.6rem] sm:text-[0.65rem] text-t2 font-bold leading-tight">{a.title}</div>
+                {earned && (
+                  <div className="text-[0.52rem] font-semibold mt-0.5 leading-tight" style={{ color: '#FFD90060' }}>
+                    {a.description}
+                  </div>
+                )}
               </div>
             )
           })}

@@ -283,7 +283,7 @@ function DangerRow({ label, sub, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between px-4 py-3 border-t border-soft hover:bg-red/5 active:bg-red/8 transition-all text-left"
+      className="w-full flex items-center justify-between px-4 py-3 border-t border-soft active:bg-red/10 transition-all text-left"
       style={{ color: '#FF4B4B' }}
     >
       <div>
