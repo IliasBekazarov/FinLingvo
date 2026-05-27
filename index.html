@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FinLingvo — Финансылык Сабаттуулук</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .form-page { display: none; animation: fade-in 0.25s ease; }
+    .form-page.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="pg-landing">
+  <div class="landing-bg">
+    <!-- Floating orbs -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div style="position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(28,176,246,0.07),transparent);top:-100px;left:50%;transform:translateX(-50%);border-radius:50%;"></div>
+      <div style="position:absolute;width:250px;height:250px;background:radial-gradient(circle,rgba(88,204,2,0.05),transparent);bottom:10%;right:5%;border-radius:50%;"></div>
+      <div style="position:absolute;width:180px;height:180px;background:radial-gradient(circle,rgba(155,89,182,0.05),transparent);bottom:20%;left:5%;border-radius:50%;"></div>
+    </div>
+
+    <div class="hero-mascot">🦅</div>
+    <h1 class="hero-title">FinLingvo</h1>
+    <p class="hero-sub">Финансылык сабаттуулукту оюн аркылуу үйрөн.<br>Кыргыз тилинде · Бекер · Кызыктуу</p>
+
+    <div class="feature-chips">
+      <span class="chip">🔥 Streak</span>
+      <span class="chip">⭐ XP Система</span>
+      <span class="chip">🏆 Лигалар</span>
+      <span class="chip">💎 Gems</span>
+      <span class="chip">🏅 Жетишкендик</span>
+    </div>
+
+    <!-- Module preview -->
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;margin-bottom:2rem;max-width:520px;">
+      <span style="padding:0.35rem 0.8rem;border-radius:99px;background:rgba(88,204,2,0.1);border:1px solid rgba(88,204,2,0.3);color:#58CC02;font-size:0.78rem;font-weight:700;">💰 Акча</span>
+      <span style="padding:0.35rem 0.8rem;border-radius:99px;background:rgba(28,176,246,0.1);border:1px solid rgba(28,176,246,0.3);color:#1CB0F6;font-size:0.78rem;font-weight:700;">💸 Киреше</span>
+      <span style="padding:0.35rem 0.8rem;border-radius:99px;background:rgba(255,150,0,0.1);border:1px solid rgba(255,150,0,0.3);color:#FF9600;font-size:0.78rem;font-weight:700;">🐷 Үнөмдөө</span>
+      <span style="padding:0.35rem 0.8rem;border-radius:99px;background:rgba(155,89,182,0.1);border:1px solid rgba(155,89,182,0.3);color:#9B59B6;font-size:0.78rem;font-weight:700;">📒 Бюджет</span>
+      <span style="padding:0.35rem 0.8rem;border-radius:99px;background:rgba(255,75,75,0.1);border:1px solid rgba(255,75,75,0.3);color:#FF4B4B;font-size:0.78rem;font-weight:700;">🏠 Актив</span>
+      <span style="padding:0.35rem 0.8rem;border-radius:99px;background:rgba(28,176,246,0.1);border:1px solid rgba(28,176,246,0.3);color:#1CB0F6;font-size:0.78rem;font-weight:700;">📈 Инвестиция</span>
+      <span style="padding:0.35rem 0.8rem;border-radius:99px;background:rgba(255,217,0,0.1);border:1px solid rgba(255,217,0,0.3);color:#FFD900;font-size:0.78rem;font-weight:700;">👑 + 4 бөлүм</span>
+    </div>
+
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="showAuth()" style="font-size:1rem;padding:1.05rem;">
+        БАШТОО — БЕКЕР!
+      </button>
+      <button class="btn-secondary" onclick="guestLogin()">
+        КОНОК КАТАРЫ БАЙКАП КӨРҮҮ
+      </button>
+    </div>
+    <p style="color:#3d4860;font-size:0.72rem;font-weight:600;margin-top:1rem;">10,000+ окуучу · Толугу менен бекер · Кыргызча</p>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="pg-auth" style="display:none;">
+  <div class="auth-bg">
+
+    <!-- Back -->
+    <button onclick="showLanding()" style="position:absolute;top:1.2rem;left:1.2rem;background:none;border:none;color:#7a859e;font-size:0.85rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:0.4rem;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#7a859e'">
+      ← Артка
+    </button>
+
+    <div class="auth-card">
+
+      <!-- Logo -->
+      <div class="auth-logo-wrap">
+        <div class="auth-logo">🦅</div>
+      </div>
+
+      <h2 id="auth-title" style="text-align:center;font-size:1.55rem;font-weight:900;color:#fff;margin-bottom:0.3rem;">Кош келиңиз!</h2>
+      <p id="auth-sub" style="text-align:center;font-size:0.82rem;font-weight:600;color:#7a859e;margin-bottom:1.4rem;">Email жана сыр сөзүң менен кир</p>
+
+      <!-- Tabs -->
+      <div class="tab-switcher">
+        <button id="tab-login" class="tab-btn active" onclick="switchTab('login')">Кируу</button>
+        <button id="tab-reg" class="tab-btn" onclick="switchTab('register')">Каттоо</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="form-login" class="form-page active">
+        <div class="input-group">
+          <input id="l-email" type="email" class="input-field" placeholder="Email" oninput="syncEmail(this)">
+        </div>
+        <p id="err-l-email" class="err-msg"></p>
+
+        <div class="input-group" style="position:relative;">
+          <input id="l-pass" type="password" class="input-field" placeholder="Сыр сөз" style="padding-right:3rem;">
+          <button class="input-eye" onclick="togglePwd('l-pass',this)" type="button">👁</button>
+        </div>
+        <p id="err-l-pass" class="err-msg"></p>
+
+        <div style="height:0.8rem;"></div>
+        <button class="btn-primary" onclick="doLogin()">КИРУУ</button>
+        <div class="divider-line">же</div>
+        <button class="btn-secondary" onclick="guestLogin()">КОНОК КАТАРЫ БАЙКАП КӨРҮҮ</button>
+
+        <p style="text-align:center;font-size:0.72rem;color:#3d4860;font-weight:600;line-height:1.7;margin-top:0.75rem;">
+          Сыр сөзүңдү коопсуз каттап коёбуз.<br>Прогрессиң аккаунтуңда сакталат.
+        </p>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="form-reg" class="form-page">
+        <div class="input-group">
+          <input id="r-name" type="text" class="input-field" placeholder="Атыңыз">
+        </div>
+        <p id="err-r-name" class="err-msg"></p>
+
+        <div class="input-group">
+          <input id="r-email" type="email" class="input-field" placeholder="Email">
+        </div>
+        <p id="err-r-email" class="err-msg"></p>
+
+        <div class="input-group" style="position:relative;">
+          <input id="r-pass" type="password" class="input-field" placeholder="Сыр сөз (кеминде 6 белги)" style="padding-right:3rem;">
+          <button class="input-eye" onclick="togglePwd('r-pass',this)" type="button">👁</button>
+        </div>
+        <p id="err-r-pass" class="err-msg"></p>
+
+        <div style="height:0.8rem;"></div>
+        <button class="btn-primary" onclick="doRegister()">КАТТОО</button>
+        <div class="divider-line">же</div>
+        <button class="btn-secondary" onclick="guestLogin()">КОНОК КАТАРЫ БАЙКАП КӨРҮҮ</button>
+
+        <p style="text-align:center;font-size:0.72rem;color:#3d4860;font-weight:600;line-height:1.7;margin-top:0.75rem;">
+          Сыр сөзүңдү коопсуз каттап коёбуз.<br>Прогрессиң аккаунтуңда сакталат.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+  // Auto redirect if logged in
+  if (AUTH.isLoggedIn()) window.location.href = 'learn.html';
+
+  function showAuth() {
+    document.getElementById('pg-landing').style.display = 'none';
+    document.getElementById('pg-auth').style.display = 'block';
+  }
+
+  function showLanding() {
+    document.getElementById('pg-landing').style.display = 'block';
+    document.getElementById('pg-auth').style.display = 'none';
+  }
+
+  // Sync email between tabs
+  function syncEmail(el) {
+    const other = el.id === 'l-email' ? 'r-email' : 'l-email';
+    document.getElementById(other).value = el.value;
+  }
+
+  function switchTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('form-login').classList.toggle('active', isLogin);
+    document.getElementById('form-reg').classList.toggle('active', !isLogin);
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-reg').classList.toggle('active', !isLogin);
+    document.getElementById('auth-title').textContent = isLogin ? 'Кош келиңиз!' : 'Жаңы аккаунт';
+    document.getElementById('auth-sub').textContent = 'Email жана сыр сөзүң менен кир';
+    clearErrors();
+  }
+
+  function clearErrors() {
+    document.querySelectorAll('.err-msg').forEach(e => { e.textContent = ''; e.classList.remove('show'); });
+  }
+
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.classList.add('show'); }
+  }
+
+  function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁' : '🔒';
+  }
+
+  function doLogin() {
+    clearErrors();
+    const email = document.getElementById('l-email').value.trim();
+    const pass = document.getElementById('l-pass').value;
+    if (!email) { showErr('err-l-email', 'Email киргизиңиз'); return; }
+    if (!pass) { showErr('err-l-pass', 'Сыр сөз киргизиңиз'); return; }
+
+    // Try existing user or create new
+    if (!AUTH.getUser()) {
+      const r = AUTH.register('Окуучу', email, pass);
+      if (r.success) { window.location.href = 'learn.html'; return; }
+    }
+    const r = AUTH.login(email, pass);
+    if (r.success) {
+      window.location.href = 'learn.html';
+    } else {
+      // Create new account silently
+      const r2 = AUTH.register('Окуучу', email, pass);
+      if (r2.success) window.location.href = 'learn.html';
+      else showErr('err-l-pass', r.message);
+    }
+  }
+
+  function doRegister() {
+    clearErrors();
+    const name = document.getElementById('r-name').value.trim();
+    const email = document.getElementById('r-email').value.trim();
+    const pass = document.getElementById('r-pass').value;
+    if (!name) { showErr('err-r-name', 'Атыңызды киргизиңиз'); return; }
+    if (!email || !email.includes('@')) { showErr('err-r-email', 'Туура email киргизиңиз'); return; }
+    if (pass.length < 6) { showErr('err-r-pass', 'Кеминде 6 белги болуу керек'); return; }
+    const r = AUTH.register(name, email, pass);
+    if (r.success) window.location.href = 'learn.html';
+    else showErr('err-r-pass', r.message);
+  }
+
+  function guestLogin() {
+    AUTH.loginAsGuest();
+    window.location.href = 'learn.html';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('form-login').classList.contains('active')) doLogin();
+    else doRegister();
+  });
+</script>
+</body>
+</html>

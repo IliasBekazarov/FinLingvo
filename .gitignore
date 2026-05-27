@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables — NEVER commit real secrets
+.env
+.env.local
+.env.production
+**/. env
+**/.env.local
+**/.env.production
+admin-api/.env
+
+# Build outputs
+dist/
+**/dist/
+client/dist/
+
+# OS
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Prisma generated (auto-generated on deploy)
+server/prisma/migrations/.migration_lock.toml
+
+# Misc
+*.pem
+coverage/

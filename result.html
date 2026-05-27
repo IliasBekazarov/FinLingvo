@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FinLingvo — Жыйынтык</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .ach-unlock {
+      background: linear-gradient(135deg, rgba(255,217,0,0.12), rgba(255,217,0,0.04));
+      border: 1.5px solid rgba(255,217,0,0.35);
+      border-radius: 18px;
+      padding: 0.9rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      margin-bottom: 1.2rem;
+      animation: bounce-in 0.5s ease 1s both;
+    }
+    .new-tag {
+      display: inline-block;
+      background: #FF4B4B;
+      color: white;
+      font-size: 0.58rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      padding: 2px 5px;
+      border-radius: 5px;
+      vertical-align: middle;
+      margin-left: 4px;
+      animation: pop 1s ease-in-out infinite;
+    }
+    .lesson-info-box {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 0.9rem 1.2rem;
+      margin-bottom: 1.4rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="result-bg">
+  <div style="max-width:460px;width:100%;">
+
+    <!-- Trophy -->
+    <div class="result-trophy" id="trophy">🏆</div>
+    <h1 class="result-title gradient-gold" id="r-title">Мыкты!</h1>
+    <p class="result-sub" id="r-sub">Сабакты ийгиликтүү аяктадың!</p>
+
+    <!-- Stars -->
+    <div class="stars-row">
+      <span class="star-i" id="s1">⭐</span>
+      <span class="star-i" id="s2">⭐</span>
+      <span class="star-i" id="s3">⭐</span>
+    </div>
+
+    <!-- Perfect badge -->
+    <div class="perfect-badge" id="perf-badge" style="display:none;">
+      ✨ МҮНӨЗСҮЗ! Бир да ката жок! +25 Бонус XP ✨
+    </div>
+
+    <!-- Stats -->
+    <div class="result-stats">
+      <div class="result-stat" style="border-color:rgba(88,204,2,0.3);">
+        <span class="result-stat-val gradient-green" id="r-xp">0</span>
+        <span class="result-stat-lbl">XP</span>
+      </div>
+      <div class="result-stat" style="border-color:rgba(28,176,246,0.3);">
+        <span class="result-stat-val gradient-blue" id="r-gems">0</span>
+        <span class="result-stat-lbl">💎 Gems</span>
+      </div>
+      <div class="result-stat" style="border-color:rgba(255,75,75,0.3);">
+        <span class="result-stat-val" style="color:#FF4B4B;" id="r-acc">0%</span>
+        <span class="result-stat-lbl">Тактык</span>
+      </div>
+    </div>
+
+    <!-- Achievements -->
+    <div id="achs-area"></div>
+
+    <!-- Lesson info -->
+    <div class="lesson-info-box">
+      <div style="font-size:0.65rem;font-weight:800;color:#3d4860;letter-spacing:2px;text-transform:uppercase;margin-bottom:0.3rem;">САБАК</div>
+      <div style="font-size:1.05rem;font-weight:900;" id="r-lesson">—</div>
+      <div style="font-size:0.82rem;font-weight:600;color:#7a859e;" id="r-module">—</div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;flex-direction:column;gap:0.65rem;width:100%;max-width:400px;margin:0 auto;">
+      <button class="btn-primary" style="font-size:1rem;padding:1.05rem;" onclick="continueLearn()">
+        УЛАНТУУ →
+      </button>
+      <button style="display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;padding:0.95rem;background:rgba(88,204,2,0.08);border:1.5px solid rgba(88,204,2,0.3);color:#58CC02;font-weight:800;font-size:0.85rem;border-radius:14px;cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;letter-spacing:0.5px;" onclick="shareResult()" onmouseover="this.style.background='rgba(88,204,2,0.14)'" onmouseout="this.style.background='rgba(88,204,2,0.08)'">
+        📤 БӨЛҮШҮҮ
+      </button>
+      <button class="btn-secondary" style="margin-bottom:0;" onclick="window.location.href='learn.html'">
+        ← ҮЙРӨНҮҮГӨ КАЙТУУ
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if (!AUTH.isLoggedIn()) window.location.href = 'index.html';
+  const result = APP.getResult();
+  if (!result) window.location.href = 'learn.html';
+  const user = AUTH.getUser();
+  APP.audio.init();
+
+  function animNum(id, to, suffix) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const dur = 900, start = performance.now();
+    const run = now => {
+      const p = Math.min((now - start) / dur, 1);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(to * e) + (suffix || '');
+      if (p < 1) requestAnimationFrame(run);
+    };
+    requestAnimationFrame(run);
+  }
+
+  function render() {
+    const { stars, perfect, xpEarned, gemsEarned, correctCount, totalQuestions, lessonTitle, moduleTitle } = result;
+
+    // Trophy
+    document.getElementById('trophy').textContent = perfect ? '🏆' : stars >= 2 ? '🎯' : '💪';
+
+    const titles = { 3:'Укмуштуудай!', 2:'Жакшы иш!', 1:'Улантуу!' };
+    const subs = { 3:'Абдан жакшы жооптодуң! 🎉', 2:'Жакшы жооп бердиң!', 1:`${result.wrongCount} ката болду, алдыга!` };
+    document.getElementById('r-title').textContent = titles[stars] || 'Аяктадың!';
+    document.getElementById('r-sub').textContent   = subs[stars] || '';
+
+    if (perfect) document.getElementById('perf-badge').style.display = 'block';
+
+    // Stars animate
+    setTimeout(() => {
+      for (let i = 1; i <= stars; i++) {
+        setTimeout(() => {
+          const el = document.getElementById(`s${i}`);
+          if (el) el.classList.add('on');
+          APP.audio.play('correct');
+        }, i * 280);
+      }
+    }, 600);
+
+    // Numbers
+    setTimeout(() => {
+      animNum('r-xp', xpEarned);
+      animNum('r-gems', gemsEarned);
+      const acc = Math.round(correctCount / totalQuestions * 100);
+      setTimeout(() => { const el = document.getElementById('r-acc'); if (el) el.textContent = acc + '%'; }, 700);
+    }, 300);
+
+    document.getElementById('r-lesson').textContent = lessonTitle || '—';
+    document.getElementById('r-module').textContent = moduleTitle || '—';
+
+    // Confetti
+    if (stars >= 3) {
+      setTimeout(() => APP.confetti.start(), 700);
+      setTimeout(() => APP.audio.play('levelup'), 500);
+    } else {
+      setTimeout(() => APP.audio.play('complete'), 300);
+    }
+
+    renderAchs();
+  }
+
+  function renderAchs() {
+    const area = document.getElementById('achs-area');
+    const prev = JSON.parse(sessionStorage.getItem('prev_achs') || '[]');
+    const curr = user.achievements || [];
+    const newOnes = curr.filter(a => !prev.includes(a));
+    if (!newOnes.length) return;
+    let html = '';
+    newOnes.forEach(id => {
+      const a = ACHIEVEMENTS.find(x => x.id === id);
+      if (!a) return;
+      html += `
+        <div class="ach-unlock">
+          <span style="font-size:2.3rem;">${a.icon}</span>
+          <div>
+            <div style="font-size:0.62rem;font-weight:900;letter-spacing:2px;color:#FFD900;text-transform:uppercase;">
+              ЖАҢЫ ЖЕТИШКЕНДИК <span class="new-tag">ЖАҢЫ</span>
+            </div>
+            <div style="font-weight:900;font-size:0.95rem;margin-top:2px;">${a.title}</div>
+            <div style="font-size:0.75rem;color:#7a859e;font-weight:600;">${a.description}</div>
+          </div>
+        </div>`;
+    });
+    area.innerHTML = html;
+  }
+
+  function continueLearn() {
+    const next = AUTH.getNextLesson();
+    if (next) {
+      APP.saveLessonState({
+        moduleId: next.module.id,
+        lessonId: next.lesson.id,
+        moduleTitle: next.module.title,
+        lessonTitle: next.lesson.title,
+        questions: next.lesson.questions,
+        xpReward: next.lesson.xpReward,
+        gemReward: next.lesson.gemReward
+      });
+      window.location.href = 'lesson.html';
+    } else {
+      window.location.href = 'learn.html';
+    }
+  }
+
+  function shareResult() {
+    const txt = `FinLingvo'до "${result.lessonTitle}" сабагын аяктадым! +${result.xpEarned} XP! 🎉 #FinLingvo`;
+    if (navigator.share) navigator.share({ title: 'FinLingvo', text: txt });
+    else navigator.clipboard?.writeText(txt);
+  }
+
+  sessionStorage.setItem('prev_achs', JSON.stringify((user.achievements || []).slice(0, -1)));
+  render();
+</script>
+</body>
+</html>

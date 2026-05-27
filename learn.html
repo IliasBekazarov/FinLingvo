@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FinLingvo — Үйрөнүү</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Mobile overlay -->
+  <div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar" id="sidebar">
+    <a href="learn.html" class="sidebar-logo" style="text-decoration:none;">
+      <div class="sidebar-logo-icon">🦅</div>
+      <div>
+        <div class="sidebar-logo-title">FinLingo</div>
+        <div class="sidebar-logo-sub">Финансылык саббатулук оюну</div>
+      </div>
+    </a>
+
+    <nav style="flex:1;">
+      <a href="learn.html"       class="nav-item active"><span class="nav-icon">📚</span>Үйрөнүү</a>
+      <a href="leaderboard.html" class="nav-item"><span class="nav-icon" style="font-size:0.95rem;">📊</span>Лига</a>
+      <a href="shop.html"        class="nav-item"><span class="nav-icon">🛒</span>Дүкөн</a>
+      <a href="profile.html"     class="nav-item"><span class="nav-icon">👤</span>Профиль</a>
+      <a href="settings.html"    class="nav-item"><span class="nav-icon">⚙️</span>Орнотуу</a>
+    </nav>
+
+    <!-- User card -->
+    <div id="sidebar-user" style="padding:0.6rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:auto;"></div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main-content">
+
+    <!-- TOP BAR -->
+    <div class="top-stats">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <div style="flex:1;"></div>
+      <div class="stat-pill streak">🔥 <span id="stat-streak">0</span></div>
+      <div class="stat-pill gems">💎 <span id="stat-gems">0</span></div>
+      <div class="stat-pill hearts">❤️ <span id="stat-hearts">5</span></div>
+    </div>
+
+    <!-- LEARNING PATH -->
+    <div class="learn-wrap" id="learn-wrap"></div>
+
+  </div>
+
+  <!-- MOBILE NAV -->
+  <nav class="mobile-nav">
+    <div class="mob-nav-items">
+      <a href="learn.html"       class="mob-nav-item active"><span class="ico">📚</span>Үйрөнүү</a>
+      <a href="leaderboard.html" class="mob-nav-item"><span class="ico">🏆</span>Лига</a>
+      <a href="shop.html"        class="mob-nav-item"><span class="ico">🛒</span>Дүкөн</a>
+      <a href="profile.html"     class="mob-nav-item"><span class="ico">👤</span>Профиль</a>
+    </div>
+  </nav>
+
+</div>
+
+<!-- No hearts modal -->
+<div class="modal-overlay" id="no-hearts-modal" style="display:none;" onclick="this.style.display='none'">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div style="font-size:3.5rem;margin-bottom:0.8rem;animation:bounce-in 0.5s ease;">💔</div>
+    <h2 style="font-size:1.35rem;font-weight:900;margin-bottom:0.5rem;">Жандар бүттү!</h2>
+    <p style="color:#7a859e;font-size:0.85rem;font-weight:600;margin-bottom:1.5rem;">Жаңы жандарды алуу үчүн дүкөнгө кир же күтүп тур</p>
+    <button class="btn-primary" style="margin-bottom:0.6rem;" onclick="window.location.href='shop.html'">🛒 ДҮКӨН — 350 💎</button>
+    <button class="btn-secondary" style="margin-bottom:0;" onclick="document.getElementById('no-hearts-modal').style.display='none'">⏳ КҮТҮП ТУРАМ</button>
+    <p style="font-size:0.7rem;color:#3d4860;font-weight:600;margin-top:0.75rem;">Ар 30 мүнөттөн 1 жан кайтып келет</p>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if (!AUTH.isLoggedIn()) window.location.href = 'index.html';
+
+  const user = AUTH.getUser();
+  APP.updateHeaderStats();
+
+  // Sidebar user
+  (function() {
+    const u = AUTH.getUser();
+    const league = LEAGUES.find(l => l.id === u.league) || LEAGUES[0];
+    document.getElementById('sidebar-user').innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.65rem;padding:0.5rem;">
+        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(145deg,#162240,#0b1628);display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:2px solid rgba(28,176,246,0.3);flex-shrink:0;">${u.avatar||'🦅'}</div>
+        <div style="overflow:hidden;">
+          <div style="font-weight:800;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name}</div>
+          <div style="font-size:0.65rem;color:#7a859e;font-weight:600;">${league.icon} ${league.name} · ${u.xp} XP</div>
+        </div>
+      </div>
+    `;
+  })();
+
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('mob-overlay').classList.add('show');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('mob-overlay').classList.remove('show');
+  }
+
+  function startLesson(lessonId, unlocked) {
+    if (!unlocked) {
+      showToast('Алдыңкы сабакты аяктаңыз!', 'warning');
+      return;
+    }
+    const u = AUTH.getUser();
+    if (u.hearts <= 0) {
+      document.getElementById('no-hearts-modal').style.display = 'flex';
+      return;
+    }
+    const found = APP.findLesson(lessonId);
+    if (!found) return;
+    APP.saveLessonState({
+      moduleId: found.module.id,
+      lessonId,
+      moduleTitle: found.module.title,
+      lessonTitle: found.lesson.title,
+      questions: found.lesson.questions,
+      xpReward: found.lesson.xpReward,
+      gemReward: found.lesson.gemReward
+    });
+    window.location.href = 'lesson.html';
+  }
+
+  function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.className = `fl-toast ${type}`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 2500);
+  }
+
+  // ── RENDER PATH ──────────────────────────────────────────────
+  function renderPath() {
+    const wrap = document.getElementById('learn-wrap');
+    const u = AUTH.getUser();
+    let html = '';
+
+    // ── Welcome banner ──
+    const totalPct = APP.calculateTotalProgress();
+    html += `
+      <div class="welcome-card">
+        <div class="welcome-icon">${u.streak > 0 ? '🔥' : '🌱'}</div>
+        <div style="flex:1;">
+          <div class="welcome-name">Саламатсыңбы, ${u.name}!</div>
+          <div class="welcome-sub">${u.streak > 0 ? `${u.streak} күн катары үйрөнүп жатасың! 🎉` : 'Бүгүн биринчи сабагыңды башташтайбыз!'}</div>
+          <div class="mini-progress-bar" style="max-width:260px;">
+            <div class="mini-progress-fill" style="width:${totalPct}%;"></div>
+          </div>
+        </div>
+        <div style="font-size:1.2rem;font-weight:900;color:#1CB0F6;flex-shrink:0;">${totalPct}%</div>
+      </div>
+    `;
+
+    // Node sizes per index inside module
+    const nodeSizes = ['node-xl', 'node-lg', 'node-md', 'node-sm'];
+    // Zigzag positions per index
+    const positions = ['pos-center', 'pos-right', 'pos-left'];
+    // Connector heights vary too
+    const connH = [40, 36, 32];
+
+    MODULES.forEach((module, mIdx) => {
+      const progress = APP.calculateModuleProgress(module.id);
+      const allLessons = module.lessons;
+
+      // ── Section header ──
+      html += `
+        <div class="section-hdr animate-slide-up" style="background:linear-gradient(135deg,${module.color}1a,${module.color}08);border:1.5px solid ${module.color}30;color:#fff;animation-delay:${mIdx*0.04}s;">
+          <div class="section-hdr-icon" style="background:${module.color}25;">
+            ${module.emoji}
+          </div>
+          <div class="section-hdr-body">
+            <div class="section-hdr-tag" style="color:${module.color};">${mIdx+1}-БӨЛҮМ</div>
+            <div class="section-hdr-title">${module.title}</div>
+            <div class="section-hdr-progress">
+              <div class="section-hdr-progress-fill" style="width:${progress.pct}%;background:${module.color};"></div>
+            </div>
+          </div>
+          <div class="section-hdr-right" style="color:${module.color};">
+            <div class="section-hdr-count">${progress.completed}/${progress.total}</div>
+            <div class="section-hdr-pct">${progress.pct}%</div>
+          </div>
+        </div>
+
+        <div class="lesson-path">
+      `;
+
+      allLessons.forEach((lesson, lIdx) => {
+        const isCompleted = AUTH.isLessonCompleted(lesson.id);
+        const isUnlocked = APP.isLessonUnlocked(lesson.id);
+        const isCurrent  = isUnlocked && !isCompleted;
+
+        const state = isCompleted ? 'state-completed' : isCurrent ? 'state-current' : 'state-locked';
+        const sizeClass = nodeSizes[Math.min(lIdx, nodeSizes.length - 1)];
+        const posClass  = positions[lIdx % positions.length];
+        const cH = connH[Math.min(lIdx, connH.length - 1)];
+
+        const icon = lesson.icon;
+        const labelClass = isCurrent ? 'is-current' : '';
+
+        html += `
+          <div class="node-wrap ${posClass}" style="animation:slide-up 0.4s ease both;animation-delay:${lIdx*0.08}s;">
+            <div class="node ${sizeClass} ${state}" onclick="startLesson('${lesson.id}',${isUnlocked})">
+              <span>${isCompleted ? '✅' : icon}</span>
+              ${isCompleted ? '<div class="node-check">✓</div>' : ''}
+              ${(!isCompleted && !isCurrent) ? '<div class="node-lock">🔒</div>' : ''}
+            </div>
+            <div class="node-label ${labelClass}">${lesson.title}</div>
+            ${isCompleted ? '<div class="node-stars">⭐⭐⭐</div>' : ''}
+            ${isCurrent ? '<div style="font-size:0.68rem;color:#1CB0F6;font-weight:800;margin-top:3px;">▶ АЗЫР</div>' : ''}
+
+            <!-- Tooltip -->
+            <div class="node-tooltip">
+              <div class="tooltip-title">${icon} ${lesson.title}</div>
+              <div class="tooltip-meta">
+                ${isCompleted ? '✅ Аяктадың! ' : isUnlocked ? `${lesson.questions.length} суроо · +${lesson.xpReward} XP · +${lesson.gemReward} 💎` : '🔒 Алдыңкы сабакты аяктаңыз'}
+              </div>
+              ${isUnlocked
+                ? `<button class="tooltip-btn" onclick="startLesson('${lesson.id}',true)">${isCompleted ? '🔄 КАЙРА' : '▶ БАШТОО'}</button>`
+                : `<div class="tooltip-btn locked-btn">🔒 ЖАБЫК</div>`
+              }
+            </div>
+          </div>
+        `;
+
+        // Connector between nodes
+        if (lIdx < allLessons.length - 1) {
+          html += `<div class="connector ${isCompleted ? 'done' : 'next'}" style="height:${cH}px;"></div>`;
+        }
+      });
+
+      html += `</div>`;
+      if (mIdx < MODULES.length - 1) {
+        html += `<div style="height:0.8rem;"></div>`;
+      }
+    });
+
+    wrap.innerHTML = html;
+  }
+
+  renderPath();
+</script>
+</body>
+</html>

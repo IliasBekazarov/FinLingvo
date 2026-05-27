@@ -1,0 +1,110 @@
+{
+  "users": [
+    {
+      "id": "42f72dec-f4eb-4a75-945c-f7632cd4db12",
+      "name": "Нурбаян",
+      "email": "nurbekovanurbaian@gmail.com",
+      "avatar": "🦅",
+      "passwordHash": "$2a$10$o4PGTOZEuthLTycCKZCN0OpZ4MnYub94QhZohhsgyvwxTM.rUNv9u",
+      "createdAt": "2026-05-14T05:37:57.130Z",
+      "lastSeenAt": "2026-05-14T05:41:09.371Z",
+      "state": {
+        "xp": 0,
+        "hearts": 5,
+        "heartsRefilledAt": 1778737151648,
+        "gems": 130,
+        "streak": 0,
+        "lastActiveDate": null,
+        "lastDailyBonusDate": "2026-05-14",
+        "completedLessons": [],
+        "perfectLessons": [],
+        "achievements": [],
+        "ownedShop": [],
+        "settings": {
+          "sound": true,
+          "animations": true
+        }
+      }
+    },
+    {
+      "id": "38dcc8d5-1338-4520-822d-84b91fbef14d",
+      "name": "ilias",
+      "email": "iliasbeknazarov4@gmail.com",
+      "avatar": "🦅",
+      "passwordHash": "$2a$10$dY5ZAih5XtEBHheU7YHhy.fhUgQtH3kxZtHe46e6IgG1lK28NMdu6",
+      "createdAt": "2026-05-14T05:39:38.738Z",
+      "lastSeenAt": "2026-05-17T11:34:33.213Z",
+      "state": {
+        "xp": 50,
+        "hearts": 5,
+        "heartsRefilledAt": 1779017673213,
+        "gems": 240,
+        "streak": 1,
+        "lastActiveDate": "Thu May 14 2026",
+        "lastDailyBonusDate": "2026-05-17",
+        "completedLessons": [
+          "1-1"
+        ],
+        "perfectLessons": [],
+        "achievements": [],
+        "ownedShop": [],
+        "settings": {
+          "sound": false,
+          "animations": false
+        }
+      }
+    },
+    {
+      "id": "66ce7f00-430c-4620-b0ea-8a9731042e6f",
+      "name": "Максат",
+      "email": "maksatorozbakov58@gmail.com",
+      "avatar": "🦅",
+      "passwordHash": "$2a$10$xaB5l7X2iMNbfWTm3gk.3uSgeSLLWKB/qNFqPq3dusGqSjdr5GYhi",
+      "createdAt": "2026-05-16T06:19:20.485Z",
+      "lastSeenAt": "2026-05-16T09:04:31.252Z",
+      "state": {
+        "xp": 0,
+        "hearts": 5,
+        "heartsRefilledAt": 1778922271252,
+        "gems": 130,
+        "streak": 0,
+        "lastActiveDate": null,
+        "lastDailyBonusDate": "2026-05-16",
+        "completedLessons": [],
+        "perfectLessons": [],
+        "achievements": [],
+        "ownedShop": [],
+        "settings": {
+          "sound": true,
+          "animations": true
+        }
+      }
+    },
+    {
+      "id": "b1a79bad-26dd-46c3-a888-5433d4e0ad3a",
+      "name": "Максат",
+      "email": "maksatorozbekov58@gmail.com",
+      "avatar": "🦅",
+      "passwordHash": "$2a$10$s0MasvYNvkY9KsOSAX3q7ujs8U/eEfERiZys.Dx4xQM23rYhfQLDu",
+      "createdAt": "2026-05-16T06:55:03.733Z",
+      "lastSeenAt": "2026-05-16T06:55:03.733Z",
+      "state": {
+        "xp": 0,
+        "hearts": 5,
+        "heartsRefilledAt": 1778914503733,
+        "gems": 100,
+        "streak": 0,
+        "lastActiveDate": null,
+        "lastDailyBonusDate": null,
+        "completedLessons": [],
+        "perfectLessons": [],
+        "achievements": [],
+        "ownedShop": [],
+        "settings": {
+          "sound": true,
+          "animations": true
+        }
+      }
+    }
+  ]
+}

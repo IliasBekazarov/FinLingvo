@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Жөндөөлөр — FinLingvo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.st-page{display:flex;min-height:100vh;background:var(--bg)}
+.st-main{flex:1;padding:24px 16px 120px;width:100%;box-sizing:border-box}
+@media(min-width:769px){
+  .st-main{margin-left:240px;padding:36px 48px 60px}
+  .st-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+}
+@media(min-width:1200px){.st-main{padding:40px 80px 60px}}
+.st-header{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.st-header-icon{width:52px;height:52px;background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1.5px solid rgba(255,255,255,.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;backdrop-filter:blur(8px)}
+.st-header-title{font-size:1.5rem;font-weight:900}
+.st-header-sub{font-size:.83rem;color:var(--muted);font-weight:700;margin-top:2px}
+.st-card{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.07);border-radius:20px;overflow:hidden;margin-bottom:16px;transition:border-color .2s}
+.st-card:hover{border-color:rgba(255,255,255,.12)}
+.st-card-title{padding:14px 18px 10px;font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:8px}
+.st-row{display:flex;align-items:center;gap:14px;padding:14px 18px;transition:background .15s}
+.st-row+.st-row{border-top:1px solid rgba(255,255,255,.04)}
+.st-row.clickable{cursor:pointer}
+.st-row.clickable:hover{background:rgba(255,255,255,.03)}
+.st-row-icon{width:38px;height:38px;flex-shrink:0;border-radius:12px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:transform .2s}
+.st-row.clickable:hover .st-row-icon{transform:scale(1.1)}
+.st-row-body{flex:1;min-width:0}
+.st-row-title{font-size:.9rem;font-weight:800}
+.st-row-sub{font-size:.75rem;color:var(--muted);font-weight:600;margin-top:2px;line-height:1.4}
+.st-chevron{color:rgba(255,255,255,.2);font-size:1.2rem;font-weight:900;flex-shrink:0;transition:color .2s,transform .2s}
+.st-row.clickable:hover .st-chevron{color:rgba(255,255,255,.5);transform:translateX(3px)}
+.fl-toggle{position:relative;flex-shrink:0;width:50px;height:28px;border:none;outline:none;cursor:pointer;background:rgba(255,255,255,.08);border-radius:100px;transition:background .25s cubic-bezier(.4,0,.2,1);box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}
+.fl-toggle::after{content:"";position:absolute;top:4px;left:4px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+.fl-toggle.on{background:var(--green);box-shadow:inset 0 1px 3px rgba(0,0,0,.2),0 0 12px rgba(88,204,2,.3)}
+.fl-toggle.on::after{transform:translateX(22px)}
+.cal-wrap{padding:16px 18px}
+.cal-day-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+.cal-day-label{text-align:center;font-size:.6rem;font-weight:800;color:var(--muted);text-transform:uppercase}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-day{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;background:rgba(255,255,255,.04);color:var(--muted);transition:transform .15s}
+.cal-day:hover{transform:scale(1.15)}
+.cal-day.active{background:var(--green);color:#fff;box-shadow:0 0 8px rgba(88,204,2,.35)}
+.cal-day.today{background:var(--yellow);color:#1a1a1a;box-shadow:0 0 8px rgba(255,217,0,.35)}
+.cal-streak-stat{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)}
+.cal-stat{text-align:center}
+.cal-stat-val{font-size:1.3rem;font-weight:900}
+.cal-stat-label{font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-top:2px}
+.st-danger{background:rgba(255,75,75,.04);border:1.5px solid rgba(255,75,75,.18);border-radius:20px;padding:20px;margin-bottom:16px}
+.st-danger-title{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.st-danger-btns{display:flex;flex-direction:column;gap:10px}
+@media(min-width:480px){.st-danger-btns{flex-direction:row}}
+.st-logout{width:100%;padding:14px;border-radius:16px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);color:var(--text);font-size:.95rem;font-weight:800;cursor:pointer;transition:all .2s;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:10px}
+.st-logout:hover{background:rgba(255,75,75,.08);border-color:rgba(255,75,75,.3);color:var(--red)}
+.st-version{text-align:center;padding:16px 0;color:var(--muted);font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.st-version-dot{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+.st-profile-card{background:linear-gradient(135deg,rgba(88,204,2,.08),rgba(28,176,246,.06));border:1.5px solid rgba(88,204,2,.2);border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:16px;margin-bottom:20px;cursor:pointer;transition:all .2s}
+.st-profile-card:hover{border-color:rgba(88,204,2,.4);transform:translateY(-2px);box-shadow:0 8px 24px rgba(88,204,2,.1)}
+.st-profile-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;border:3px solid rgba(88,204,2,.4);flex-shrink:0}
+.st-profile-name{font-size:1rem;font-weight:900}
+.st-profile-email{font-size:.78rem;color:var(--muted);font-weight:600;margin-top:2px}
+.st-profile-edit{margin-left:auto;flex-shrink:0;color:var(--green);font-size:.78rem;font-weight:800;display:flex;align-items:center;gap:4px}
+</style>
+</head>
+<body>
+<div class="st-page">
+  <div id="sidenav-mount"></div>
+  <main class="st-main">
+    <div id="top-bar"></div>
+
+    <div class="st-header">
+      <div class="st-header-icon">&#9881;&#65039;</div>
+      <div>
+        <div class="st-header-title">Жөндөөлөр</div>
+        <div class="st-header-sub">Тиркемени ыңгайлаштыр</div>
+      </div>
+    </div>
+
+    <div class="st-profile-card" onclick="editProfile()">
+      <div class="st-profile-avatar" id="st-avatar">?</div>
+      <div>
+        <div class="st-profile-name" id="st-name">Жүктөлүүдө...</div>
+        <div class="st-profile-email" id="st-email">—</div>
+      </div>
+      <div class="st-profile-edit">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Өзгөртүү
+      </div>
+    </div>
+
+    <div class="st-grid">
+      <div>
+        <div class="st-card">
+          <div class="st-card-title">&#128218; Окуу</div>
+          <div class="st-row">
+            <div class="st-row-icon">&#128266;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Үн эффекттер</div>
+              <div class="st-row-sub">Туура/ката жоопто үн чыгарат</div>
+            </div>
+            <button class="fl-toggle on" id="toggle-sound" onclick="toggle('sound')"></button>
+          </div>
+          <div class="st-row">
+            <div class="st-row-icon">&#128243;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Дирилдөө</div>
+              <div class="st-row-sub">Мобилдик вибрация</div>
+            </div>
+            <button class="fl-toggle on" id="toggle-haptic" onclick="toggle('haptic')"></button>
+          </div>
+          <div class="st-row">
+            <div class="st-row-icon">&#9200;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Күнүмдүк эскертмелер</div>
+              <div class="st-row-sub">Стрикти жоготпоого эскертет</div>
+            </div>
+            <button class="fl-toggle" id="toggle-notif" onclick="toggle('notif')"></button>
+          </div>
+          <div class="st-row">
+            <div class="st-row-icon">&#127769;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Эс алуу режими</div>
+              <div class="st-row-sub">Сабактар аралыгын узайтат</div>
+            </div>
+            <button class="fl-toggle" id="toggle-rest" onclick="toggle('rest')"></button>
+          </div>
+          <div class="st-row">
+            <div class="st-row-icon">&#128065;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Рейтинг жашыруу</div>
+              <div class="st-row-sub">Аты лидерлер тизмесинде көрүнбөйт</div>
+            </div>
+            <button class="fl-toggle" id="toggle-private" onclick="toggle('private')"></button>
+          </div>
+        </div>
+
+        <div class="st-card">
+          <div class="st-card-title">&#128293; Серия күнтизмеси</div>
+          <div class="cal-wrap">
+            <div class="cal-day-labels" id="cal-labels"></div>
+            <div class="cal-grid" id="streak-cal"></div>
+            <div class="cal-streak-stat" id="cal-stats"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="st-card">
+          <div class="st-card-title">&#128100; Аккаунт</div>
+          <div class="st-row clickable" onclick="editProfile()">
+            <div class="st-row-icon">&#9999;&#65039;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Профилди өзгөртүү</div>
+              <div class="st-row-sub">Аты, сүрөт, email</div>
+            </div>
+            <div class="st-chevron">&#8250;</div>
+          </div>
+          <div class="st-row clickable" onclick="location.href='/profile.html'">
+            <div class="st-row-icon">&#128202;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Статистика жана прогресс</div>
+              <div class="st-row-sub">XP, жетишкендиктер, сабактар</div>
+            </div>
+            <div class="st-chevron">&#8250;</div>
+          </div>
+          <div class="st-row clickable" onclick="location.href='/leaderboard.html'">
+            <div class="st-row-icon">&#127942;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Рейтинг</div>
+              <div class="st-row-sub">Башкалар менен салыштыр</div>
+            </div>
+            <div class="st-chevron">&#8250;</div>
+          </div>
+        </div>
+
+        <div class="st-card">
+          <div class="st-card-title">&#8505;&#65039; Тиркеме жөнүндө</div>
+          <div class="st-row clickable" onclick="window.open('https://may.caim.dev','_blank')">
+            <div class="st-row-icon">&#127760;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Веб-сайт</div>
+              <div class="st-row-sub">may.caim.dev</div>
+            </div>
+            <div class="st-chevron">&#8250;</div>
+          </div>
+          <div class="st-row clickable" onclick="window.open('mailto:developercaim@gmail.com')">
+            <div class="st-row-icon">&#9993;&#65039;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Байланыш</div>
+              <div class="st-row-sub">developercaim@gmail.com</div>
+            </div>
+            <div class="st-chevron">&#8250;</div>
+          </div>
+          <div class="st-row">
+            <div class="st-row-icon">&#128737;&#65039;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Купуялык</div>
+              <div class="st-row-sub">Маалыматты сакталбайт</div>
+            </div>
+          </div>
+          <div class="st-row">
+            <div class="st-row-icon">&#127991;&#65039;</div>
+            <div class="st-row-body">
+              <div class="st-row-title">Версия</div>
+              <div class="st-row-sub">FinLingvo v2.0 · 2026</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="st-danger">
+          <div class="st-danger-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            Коркунучтуу аймак
+          </div>
+          <div class="st-danger-btns">
+            <button class="btn btn-red" style="flex:1" onclick="resetProgress()">&#128465;&#65039; Прогресс тазалоо</button>
+            <button class="btn btn-red" style="flex:1" onclick="deleteAccount()">&#10060; Аккаунт жок кылуу</button>
+          </div>
+        </div>
+
+        <button class="st-logout" onclick="logout()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Чыгуу
+        </button>
+
+        <div class="st-version">
+          <span>FinLingvo</span><span class="st-version-dot"></span>
+          <span>Кыргызстан &#127984;</span><span class="st-version-dot"></span>
+          <span>v2.0</span>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="bottom-nav-mount"></div>
+</div>
+
+<script src="/js/data.js"></script>
+<script src="/js/app.js"></script>
+<script>
+const PREFS_KEY = "fl_prefs";
+let prefs = JSON.parse(localStorage.getItem(PREFS_KEY) || '{"sound":true,"haptic":true,"notif":false,"rest":false,"private":false}');
+
+(async () => {
+  requireAuth();
+  await Store.init();
+  const u = Store.user;
+  renderTopNav(document.getElementById("top-bar"));
+  renderSideNav(document.getElementById("sidenav-mount"));
+  renderBottomNav(document.getElementById("bottom-nav-mount"));
+  updateNavStats();
+  const init = (u?.name || "?")[0].toUpperCase();
+  document.getElementById("st-avatar").textContent = init;
+  document.getElementById("st-name").textContent   = u?.name  || "Колдонуучу";
+  document.getElementById("st-email").textContent  = u?.email || "—";
+  applyPrefs();
+  renderStreakCal();
+})();
+
+function applyPrefs() {
+  Object.keys(prefs).forEach(k => {
+    const el = document.getElementById("toggle-" + k);
+    if (el) el.classList.toggle("on", !!prefs[k]);
+  });
+}
+
+function toggle(key) {
+  prefs[key] = !prefs[key];
+  localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+  const el = document.getElementById("toggle-" + key);
+  if (el) el.classList.toggle("on", prefs[key]);
+  showToast(prefs[key] ? "Иштетилди" : "Өчүрүлдү", "info");
+}
+
+function renderStreakCal() {
+  const streak = Store.user?.state?.streak || 0;
+  const today  = new Date();
+  const days   = [];
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.push({ date: d, active: i < streak, today: i === 0 });
+  }
+  const LABELS = ["Дш","Шр","Бш","Жм","Иш","Жк","Жш"];
+  document.getElementById("cal-labels").innerHTML =
+    LABELS.map(l => "<div class=\"cal-day-label\">" + l + "</div>").join("");
+  document.getElementById("streak-cal").innerHTML =
+    days.map(d => "<div class=\"cal-day " + (d.today ? "today" : d.active ? "active" : "") + "\">" + d.date.getDate() + "</div>").join("");
+  const activeDays = days.filter(d => d.active || d.today).length;
+  document.getElementById("cal-stats").innerHTML =
+    "<div class=\"cal-stat\"><div class=\"cal-stat-val\" style=\"color:var(--orange)\">&#128293; " + streak + "</div><div class=\"cal-stat-label\">Учурдагы серия</div></div>" +
+    "<div class=\"cal-stat\"><div class=\"cal-stat-val\" style=\"color:var(--yellow)\">&#11088; " + Math.max(streak,1) + "</div><div class=\"cal-stat-label\">Эң узун серия</div></div>" +
+    "<div class=\"cal-stat\"><div class=\"cal-stat-val\" style=\"color:var(--green)\">&#9989; " + activeDays + "</div><div class=\"cal-stat-label\">Акыркы 28 күн</div></div>";
+}
+
+function editProfile() {
+  const name = prompt("Жаңы атыңызды жазыңыз:", Store.user?.name || "");
+  if (name && name.trim()) {
+    document.getElementById("st-name").textContent   = name.trim();
+    document.getElementById("st-avatar").textContent = name.trim()[0].toUpperCase();
+    showToast("Аты жаңыланды", "success");
+  }
+}
+
+async function resetProgress() {
+  if (!confirm("Бардык прогрессиңиз тазаланат. Ишенесизби?")) return;
+  if (!confirm("Акыркы тастыктоо — бардыгы жок болот!")) return;
+  try {
+    await Store.patchState({ xp:0, gems:0, streak:0, hearts:5, completedLessons:[], achievements:[], ownedItems:[] });
+    showToast("Прогресс тазаланды", "warning");
+    setTimeout(() => location.reload(), 1200);
+  } catch(e) { showToast("Ката болду", "error"); }
+}
+
+function deleteAccount() {
+  alert("Аккаунтту жок кылуу үчүн developercaim@gmail.com га кайрылыңыз.");
+}
+
+function logout() {
+  if (confirm("Чыгуусуңузбу?")) { Store.logout(); location.href = "/"; }
+}
+</script>
+</body>
+</html>

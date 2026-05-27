@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" fill="none">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1CB0F6"/>
+      <stop offset="100%" stop-color="#0E9DD9"/>
+    </linearGradient>
+    <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#58CC02"/>
+      <stop offset="100%" stop-color="#3F8F01"/>
+    </linearGradient>
+    <linearGradient id="headGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#D8EAF5"/>
+    </linearGradient>
+    <linearGradient id="bellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#B8D8F0"/>
+    </linearGradient>
+    <filter id="dropshadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(0,0,0,0.25)"/>
+    </filter>
+  </defs>
+  <ellipse cx="100" cy="210" rx="45" ry="8" fill="rgba(0,0,0,0.15)"/>
+  <path d="M100 130 C75 110 40 100 20 115 C10 120 15 140 30 138 C50 135 70 145 85 155 Z" fill="url(#wingGrad)" filter="url(#dropshadow)"/>
+  <path d="M100 130 C80 115 55 108 35 118 C45 115 68 120 85 135 Z" fill="rgba(255,255,255,0.25)"/>
+  <path d="M100 130 C125 110 160 100 180 115 C190 120 185 140 170 138 C150 135 130 145 115 155 Z" fill="url(#wingGrad)" filter="url(#dropshadow)"/>
+  <path d="M100 130 C120 115 145 108 165 118 C155 115 132 120 115 135 Z" fill="rgba(255,255,255,0.25)"/>
+  <ellipse cx="100" cy="155" rx="38" ry="48" fill="url(#bodyGrad)" filter="url(#dropshadow)"/>
+  <ellipse cx="100" cy="160" rx="22" ry="32" fill="url(#bellyGrad)"/>
+  <path d="M88 145 Q100 148 112 145" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none"/>
+  <path d="M85 155 Q100 158 115 155" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none"/>
+  <path d="M86 165 Q100 168 114 165" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none"/>
+  <path d="M85 195 Q100 205 115 195 Q108 215 100 218 Q92 215 85 195 Z" fill="#0B7DB5"/>
+  <path d="M90 195 L100 218 L110 195" stroke="rgba(255,255,255,0.2)" stroke-width="1" fill="none"/>
+  <path d="M90 198 L86 210 M86 210 L80 215 M86 210 L88 216 M86 210 L92 214" stroke="#FFD900" stroke-width="3" stroke-linecap="round"/>
+  <path d="M110 198 L114 210 M114 210 L108 215 M114 210 L116 216 M114 210 L120 214" stroke="#FFD900" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="100" cy="90" rx="32" ry="34" fill="url(#headGrad)" filter="url(#dropshadow)"/>
+  <path d="M78 72 C72 55 78 45 85 50 C82 42 90 35 95 45 C96 35 104 30 106 40 C110 32 118 35 116 48 C122 44 128 52 122 62" fill="#D8EAF5" stroke="rgba(28,176,246,0.3)" stroke-width="1"/>
+  <circle cx="88" cy="88" r="9" fill="#1A3A5C"/>
+  <circle cx="88" cy="88" r="7" fill="#2C5F8A"/>
+  <circle cx="88" cy="88" r="5" fill="#0F1923"/>
+  <circle cx="90" cy="86" r="2" fill="white"/>
+  <circle cx="92" cy="89" r="1" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="112" cy="88" r="9" fill="#1A3A5C"/>
+  <circle cx="112" cy="88" r="7" fill="#2C5F8A"/>
+  <circle cx="112" cy="88" r="5" fill="#0F1923"/>
+  <circle cx="114" cy="86" r="2" fill="white"/>
+  <circle cx="116" cy="89" r="1" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="88" cy="88" r="9" fill="none" stroke="white" stroke-width="1.5" opacity="0.4"/>
+  <circle cx="112" cy="88" r="9" fill="none" stroke="white" stroke-width="1.5" opacity="0.4"/>
+  <path d="M80 81 Q88 78 95 81" stroke="#1A3A5C" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M105 81 Q112 78 120 81" stroke="#1A3A5C" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M96 100 Q100 108 104 100 Q100 96 96 100 Z" fill="#FFD900"/>
+  <path d="M96 100 Q100 103 104 100" stroke="#E5BF00" stroke-width="1" fill="none"/>
+  <circle cx="100" cy="155" r="14" fill="#FFD900" opacity="0.9"/>
+  <circle cx="100" cy="155" r="12" fill="none" stroke="#E5BF00" stroke-width="1.5"/>
+  <text x="100" y="159" text-anchor="middle" font-size="11" font-weight="900" fill="#7A5E00" font-family="Arial">₸</text>
+</svg>

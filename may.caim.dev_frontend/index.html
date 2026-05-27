@@ -1,0 +1,187 @@
+<!DOCTYPE html><!DOCTYPE html>
+
+<html lang="ky"><html lang="ky">
+
+<head>  <head>
+
+<meta charset="UTF-8">    <meta charset="UTF-8" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+<title>FinLingvo — Финансылык сабаттуулук</title>    <meta name="theme-color" content="#0B0F1A" />
+
+<meta name="description" content="Duolingo стилинде финансылык сабаттуулукту кыргызча үйрөн">    <title>FinLingvo — Кыргызча финансылык сабатуулук</title>
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">    <meta name="description" content="Duolingo стилиндеги финансылык сабактар — оюн менен үйрөн, акча башкарууну билип ал." />
+
+<link rel="stylesheet" href="/css/style.css">    <link rel="icon" type="image/svg+xml" href="/mascot.svg" />
+
+<style>    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+.hero-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+.particle{position:absolute;font-size:1.8rem;opacity:.06;animation:float var(--d,6s) ease-in-out infinite;animation-delay:var(--delay,0s)}    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+.hero-content{position:relative;z-index:1}    <script type="module" crossorigin src="/assets/index-mS6hAPOA.js"></script>
+
+.feature-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 0% 0%,rgba(88,204,2,.05) 0%,transparent 60%)}    <link rel="stylesheet" crossorigin href="/assets/index-DAVIPfju.css">
+
+.modules-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;margin-top:32px}  </head>
+
+.modules-scroll::-webkit-scrollbar{display:none}  <body>
+
+.module-chip{flex-shrink:0;padding:12px 18px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xl);display:flex;align-items:center;gap:8px;font-weight:800;font-size:.88rem;white-space:nowrap;transition:all .2s}    <div id="root"></div>
+
+.module-chip:hover{border-color:var(--border2);transform:translateY(-2px)}  </body>
+
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;margin-top:36px}</html>
+
+.step-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xl);padding:26px 20px;position:relative}
+.step-num{position:absolute;top:-14px;left:18px;background:var(--green);color:#fff;border-radius:100px;padding:3px 12px;font-size:.78rem;font-weight:900}
+.step-emoji{font-size:2rem;margin-bottom:10px;display:block}
+.step-title{font-size:.98rem;font-weight:900;margin-bottom:6px}
+.step-desc{font-size:.82rem;color:var(--muted);font-weight:600;line-height:1.5}
+.leagues-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-top:28px;scrollbar-width:none}
+.leagues-row::-webkit-scrollbar{display:none}
+.league-card{flex-shrink:0;width:110px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);padding:18px 10px;text-align:center;transition:all .2s}
+.league-card:hover{transform:translateY(-4px);border-color:var(--border2)}
+.league-card-icon{font-size:2.2rem;margin-bottom:6px}
+.league-card-name{font-size:.82rem;font-weight:800}
+.badge-strip{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px;opacity:.75}
+.badge-item{display:flex;align-items:center;gap:5px;font-size:.78rem;font-weight:700;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<nav class="landing-nav">
+  <div class="landing-logo">🦅 <em>FinLingvo</em></div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <a href="/login.html" class="btn btn-ghost btn-sm">Кирүү</a>
+    <a href="/login.html?signup=1" class="btn btn-green btn-sm">Акысыз баштоо</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-section">
+  <div class="hero-particles">
+    <span class="particle" style="left:5%;top:20%;--d:7s;--delay:0s">💰</span>
+    <span class="particle" style="left:15%;top:65%;--d:9s;--delay:1s">📈</span>
+    <span class="particle" style="left:80%;top:20%;--d:6s;--delay:2s">💎</span>
+    <span class="particle" style="left:90%;top:70%;--d:8s;--delay:.5s">🏆</span>
+    <span class="particle" style="left:50%;top:8%;--d:10s;--delay:3s">🔥</span>
+    <span class="particle" style="left:70%;top:80%;--d:7s;--delay:1.5s">⭐</span>
+    <span class="particle" style="left:25%;top:85%;--d:8s;--delay:2.5s">🏦</span>
+    <span class="particle" style="left:40%;top:45%;--d:11s;--delay:4s">👑</span>
+  </div>
+  <div class="hero-content" style="display:flex;flex-direction:column;align-items:center;gap:18px;">
+    <img src="/mascot.svg" alt="FinLingvo Mascot" class="mascot-float" style="height:140px;width:auto;margin-bottom:4px;filter:drop-shadow(0 0 20px rgba(28,176,246,0.4));">
+    <div class="hero-badge animate-fadeIn">🇰🇬 Кыргызча · Акысыз · Oюн стилинде</div>
+    <h1 class="hero-title animate-slideUp" style="text-align:center;">
+      Финансыны<br><span class="hero-grad">оюн менен</span><br>үйрөн
+    </h1>
+    <p class="hero-sub animate-fadeIn" style="text-align:center;">
+      Duolingo стилинде финансылык сабаттуулук — акча, инвестиция, бюджет, бизнес. Кыргызча, күнүнө 5 мүнөт.
+    </p>
+    <div class="hero-cta">
+      <a href="/login.html?signup=1" class="btn btn-green btn-lg">Акысыз баштоо</a>
+      <a href="/login.html?guest=1"  class="btn btn-ghost btn-lg">Байкап көрүү</a>
+    </div>
+    <div class="badge-strip">
+      <div class="badge-item">✅ Каттоо акысыз</div>
+      <div class="badge-item">📱 Ар бир түзмөктө</div>
+      <div class="badge-item">🔥 Streak</div>
+      <div class="badge-item">🏆 Лидерборд</div>
+      <div class="badge-item">💎 Жем системасы</div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num text-green">10</div><div class="hero-stat-label">Модуль</div></div>
+      <div class="hero-stat"><div class="hero-stat-num text-yellow">30+</div><div class="hero-stat-label">Сабак</div></div>
+      <div class="hero-stat"><div class="hero-stat-num text-blue">300+</div><div class="hero-stat-label">Суроо</div></div>
+      <div class="hero-stat"><div class="hero-stat-num text-purple">10</div><div class="hero-stat-label">Лига</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULES PREVIEW -->
+<section style="padding:70px 20px;background:var(--bg2)">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="section-tag">Эмне үйрөнөсүң?</div>
+    <h2 class="section-title">10 Модуль · Финансылык жолуңду баста</h2>
+    <p class="section-sub">Акчадан баштап, финансылык эркиндикке чейин — системалуу жол.</p>
+    <div class="modules-scroll">
+      <div class="module-chip">💰 Акча деген эмне?</div>
+      <div class="module-chip">🏦 Киреше жана чыгаша</div>
+      <div class="module-chip">🐷 Үнөмдөө</div>
+      <div class="module-chip">📒 Бюджет</div>
+      <div class="module-chip">🏠 Актив жана пассив</div>
+      <div class="module-chip">📈 Инвестиция</div>
+      <div class="module-chip">💳 Кредит жана карыз</div>
+      <div class="module-chip">🏢 Бизнес негиздери</div>
+      <div class="module-chip">🧠 Байлардын ой жүгүртүүсү</div>
+      <div class="module-chip">👑 Финансылык эркиндик</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="section-tag">Эмне берет?</div>
+  <h2 class="section-title">Duolingo сыяктуу, бирок финансы</h2>
+  <div class="features-grid">
+    <div class="feature-card"><span class="feature-icon">🎮</span><div class="feature-title">Oюн механикасы</div><div class="feature-desc">XP, жүрөктөр, стрик, жемдер — ар бир сабак кызыктуу</div></div>
+    <div class="feature-card"><span class="feature-icon">🏆</span><div class="feature-title">10 Лига системасы</div><div class="feature-desc">Жездан Бриллиантка — жарышып, рейтингде өс</div></div>
+    <div class="feature-card"><span class="feature-icon">🌐</span><div class="feature-title">Кыргызча</div><div class="feature-desc">Толугу менен кыргыз тилинде — эне тилиңде финансылык билим</div></div>
+    <div class="feature-card"><span class="feature-icon">📱</span><div class="feature-title">Ар бир түзмөктө</div><div class="feature-desc">Телефон, планшет, компьютер — каалаган жерде</div></div>
+    <div class="feature-card"><span class="feature-icon">⚡</span><div class="feature-title">5 мүнөт/күн</div><div class="feature-desc">Кыска сабактар — бош убактыңды эффективдүү пайдалан</div></div>
+    <div class="feature-card"><span class="feature-icon">🎯</span><div class="feature-title">Практикалык билим</div><div class="feature-desc">Чыныгы жашоодо колдонуучу мисалдар менен</div></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="padding:70px 20px;background:var(--bg2)">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="section-tag">Кантип иштейт?</div>
+    <h2 class="section-title">4 кадам — башталыш</h2>
+    <div class="steps-grid">
+      <div class="step-card"><span class="step-num">1-кадам</span><span class="step-emoji">📝</span><div class="step-title">Катталуу</div><div class="step-desc">1 мүнөттөн аз. Email жана сырсөз — баштоого даярсың</div></div>
+      <div class="step-card"><span class="step-num">2-кадам</span><span class="step-emoji">🗺️</span><div class="step-title">Жолду тандоо</div><div class="step-desc">10 модулдан тандап, биринчи сабакты баштоо</div></div>
+      <div class="step-card"><span class="step-num">3-кадам</span><span class="step-emoji">🧩</span><div class="step-title">Суроолорго жооп бер</div><div class="step-desc">Кыска, кызыктуу суроолор — туура жооп бер, XP тер</div></div>
+      <div class="step-card"><span class="step-num">4-кадам</span><span class="step-emoji">📊</span><div class="step-title">Прогрессиңди кör</div><div class="step-desc">Деңгээл ал, лигаңды жогорулат, лидербордго чык</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- LEAGUES -->
+<section class="leagues-section">
+  <div class="section-tag">Лигалар системасы</div>
+  <h2 class="section-title">Жездан Бриллиантка</h2>
+  <p class="section-sub">XP топтогон сайын жогору лигага чык</p>
+  <div class="leagues-row">
+    <div class="league-card"><div class="league-card-icon">🥉</div><div class="league-card-name">Жез</div></div>
+    <div class="league-card"><div class="league-card-icon">🥈</div><div class="league-card-name">Күмүш</div></div>
+    <div class="league-card"><div class="league-card-icon">🥇</div><div class="league-card-name">Алтын</div></div>
+    <div class="league-card"><div class="league-card-icon">💎</div><div class="league-card-name">Сапфир</div></div>
+    <div class="league-card"><div class="league-card-icon">❤️</div><div class="league-card-name">Рубин</div></div>
+    <div class="league-card"><div class="league-card-icon">💚</div><div class="league-card-name">Зумурут</div></div>
+    <div class="league-card"><div class="league-card-icon">💜</div><div class="league-card-name">Аметист</div></div>
+    <div class="league-card"><div class="league-card-icon">🤍</div><div class="league-card-name">Жемчүк</div></div>
+    <div class="league-card"><div class="league-card-icon">🖤</div><div class="league-card-name">Обсидиан</div></div>
+    <div class="league-card"><div class="league-card-icon">💠</div><div class="league-card-name">Бриллиант</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="hero-badge" style="margin-bottom:20px">🎓 Финансылык эркиндик сенин колуңда</div>
+  <h2 class="heading" style="margin-bottom:12px">Бүгүн баштайсыңбы?</h2>
+  <p style="color:var(--muted);font-weight:600;max-width:460px;margin:0 auto 32px;font-size:1rem">Биринчи сабак — азыр. Каттоо акысыз, прогрессиң булутта сакталат.</p>
+  <a href="/login.html?signup=1" class="btn btn-green btn-lg">🚀 Акысыз баштоо</a>
+</section>
+
+<footer class="footer">
+  FinLingvo · Кыргызча финансылык сабаттуулук · 2026 ·
+  <a href="/login.html">Кирүү</a> · <a href="/learn.html">Үйрөнүү</a>
+</footer>
+
+</body>
+</html>

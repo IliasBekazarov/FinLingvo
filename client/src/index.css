@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Nunito', -apple-system, sans-serif;
+    background: #0a0d18;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #212840; border-radius: 99px; }
+}
+
+@layer components {
+  /* Shimmer overlay for progress bars */
+  .shimmer-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* Glass card */
+  .glass {
+    background: rgba(19,24,38,0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* Node states */
+  .node-current {
+    background: linear-gradient(145deg,#2bbfff,#0e94d4);
+    border: 3.5px solid rgba(255,255,255,0.25);
+    animation: bounce-node 2.2s ease-in-out infinite, pulse-blue 3s ease-in-out infinite;
+  }
+  .node-completed {
+    background: linear-gradient(145deg,#65e004,#46a302);
+    border: 3.5px solid rgba(255,255,255,0.2);
+    animation: pulse-green 4s ease-in-out infinite;
+  }
+  .node-locked {
+    background: linear-gradient(145deg,#1e2840,#141c30);
+    border: 3.5px solid rgba(255,255,255,0.04);
+    cursor: not-allowed !important;
+  }
+
+  /* XP pop */
+  .xp-pop {
+    position: fixed;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #FFD900;
+    text-shadow: 0 2px 8px rgba(255,217,0,0.4);
+    pointer-events: none;
+    z-index: 999;
+    animation: xp-float 1.4s ease forwards;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar while keeping scroll */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* Bottom padding for <main> in AppLayout — clears MobileNav + iOS home indicator */
+  .pb-nav {
+    padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom)));
+  }
+
+  .gradient-text-gold {
+    background: linear-gradient(135deg,#FFD900,#FF9600);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-text-blue {
+    background: linear-gradient(135deg,#1CB0F6,#8dd8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-text-green {
+    background: linear-gradient(135deg,#58CC02,#aaff60);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .border-soft { border-color: rgba(255,255,255,0.06); }
+  .border-soft2 { border-color: rgba(255,255,255,0.1); }
+}

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Профиль — FinLingvo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* ── Layout ── */
+.profile-page { display: flex; min-height: 100vh; background: var(--bg); }
+.profile-main { flex: 1; padding: 24px 16px 110px; width: 100%; box-sizing: border-box; }
+@media (min-width: 769px) { .profile-main { margin-left: 240px; padding: 36px 48px 60px; } }
+@media (min-width: 1200px) { .profile-main { padding: 40px 80px 60px; } }
+
+/* ── Hero Banner ── */
+.p-hero {
+  position: relative; overflow: hidden;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #162235 0%, #1e3048 50%, #162235 100%);
+  border: 1.5px solid rgba(255,255,255,.08);
+  padding: 36px 28px 28px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.p-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(88,204,2,.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 90% 80%, rgba(28,176,246,.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.p-hero-noise {
+  position: absolute; inset: 0; opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Avatar with spinning ring */
+.p-avatar-wrap {
+  position: relative; width: 100px; height: 100px;
+  margin: 0 auto 16px;
+}
+.p-avatar-ring {
+  position: absolute; inset: -6px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  background: conic-gradient(var(--green) 0deg, var(--blue) 120deg, var(--purple) 240deg, var(--green) 360deg) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  animation: ring-spin 3s linear infinite;
+}
+@keyframes ring-spin { to { transform: rotate(360deg); } }
+.p-avatar {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(88,204,2,.3), rgba(28,176,246,.3));
+  border: 3px solid rgba(255,255,255,.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+}
+
+.p-name { font-size: 1.6rem; font-weight: 900; margin-bottom: 4px; }
+.p-email { font-size: .85rem; color: var(--muted); font-weight: 600; margin-bottom: 14px; }
+.p-league-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 16px; border-radius: 100px;
+  font-size: .85rem; font-weight: 900;
+  border: 2px solid; margin-bottom: 20px;
+}
+
+/* XP bar */
+.p-xp-wrap { max-width: 360px; margin: 0 auto; }
+.p-xp-labels { display: flex; justify-content: space-between; font-size: .78rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.p-xp-track {
+  height: 14px; background: rgba(255,255,255,.08);
+  border-radius: 100px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.06);
+  position: relative;
+}
+.p-xp-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--yellow-shadow), var(--yellow), #fff8a0);
+  border-radius: 100px;
+  transition: width 1s cubic-bezier(.22,1,.36,1);
+  box-shadow: 0 0 12px rgba(255,217,0,.5);
+  position: relative;
+}
+.p-xp-fill::after {
+  content: '';
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,.3) 60%, transparent 100%);
+  animation: shimmer 2s infinite;
+}
+
+/* Stats grid */
+.p-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px; margin-bottom: 22px;
+}
+@media (min-width: 480px) { .p-stats { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 769px) { .p-stats { grid-template-columns: repeat(6, 1fr); } }
+
+.p-stat {
+  background: rgba(255,255,255,.04);
+  border: 1.5px solid rgba(255,255,255,.07);
+  backdrop-filter: blur(10px);
+  border-radius: 18px; padding: 16px 12px; text-align: center;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+  cursor: default;
+}
+.p-stat:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255,255,255,.15);
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+}
+.p-stat-icon { font-size: 1.6rem; margin-bottom: 6px; }
+.p-stat-val { font-size: 1.4rem; font-weight: 900; line-height: 1; }
+.p-stat-lbl { font-size: .7rem; font-weight: 800; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .3px; }
+
+/* Section header */
+.p-section-hd {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1rem; font-weight: 900;
+  margin-bottom: 14px; color: var(--text2);
+}
+.p-section-hd-line {
+  flex: 1; height: 1.5px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* Achievements */
+.p-ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px; margin-bottom: 28px;
+}
+.p-ach {
+  border-radius: 18px; padding: 16px 12px; text-align: center;
+  border: 1.5px solid rgba(255,255,255,.06);
+  background: rgba(255,255,255,.03);
+  transition: all .25s;
+  position: relative; overflow: hidden;
+}
+.p-ach.done {
+  border-color: rgba(255,217,0,.35);
+  background: rgba(255,217,0,.05);
+  box-shadow: 0 0 20px rgba(255,217,0,.08);
+}
+.p-ach.done::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255,217,0,.1), transparent 70%);
+}
+.p-ach.locked { opacity: .4; filter: grayscale(.5); }
+.p-ach-emoji { font-size: 2rem; margin-bottom: 8px; display: block; }
+.p-ach-title { font-size: .8rem; font-weight: 900; margin-bottom: 3px; }
+.p-ach-desc { font-size: .7rem; color: var(--muted); font-weight: 600; line-height: 1.3; }
+.p-ach.done .p-ach-title { color: var(--yellow); }
+
+/* Logout */
+.p-logout {
+  margin-top: 8px;
+  background: rgba(255,75,75,.1);
+  border: 1.5px solid rgba(255,75,75,.25);
+  color: var(--red);
+  border-radius: 14px; padding: 14px;
+  font-weight: 800; font-size: .95rem;
+  width: 100%; cursor: pointer;
+  transition: all .2s;
+}
+.p-logout:hover {
+  background: rgba(255,75,75,.18);
+  border-color: rgba(255,75,75,.4);
+  transform: translateY(-1px);
+}
+
+/* Slide-up fade animation */
+.slide-up { opacity: 0; transform: translateY(18px); animation: slideUp .5s ease forwards; }
+.slide-up:nth-child(1) { animation-delay: .05s; }
+.slide-up:nth-child(2) { animation-delay: .1s; }
+.slide-up:nth-child(3) { animation-delay: .15s; }
+.slide-up:nth-child(4) { animation-delay: .2s; }
+.slide-up:nth-child(5) { animation-delay: .25s; }
+.slide-up:nth-child(6) { animation-delay: .3s; }
+</style>
+</head>
+<body>
+<div class="profile-page">
+  <div id="sidenav-mount"></div>
+
+  <main class="profile-main">
+    <div id="top-bar"></div>
+
+    <!-- Hero Banner -->
+    <div class="p-hero animate-scaleIn">
+      <div class="p-hero-noise"></div>
+      <div class="p-avatar-wrap">
+        <div class="p-avatar-ring"></div>
+        <div class="p-avatar" id="profile-avatar">🦅</div>
+      </div>
+      <div class="p-name"  id="profile-name">...</div>
+      <div class="p-email" id="profile-email"></div>
+      <div class="p-league-pill" id="league-badge">🥉 Коло</div>
+      <div class="p-xp-wrap">
+        <div class="p-xp-labels">
+          <span>Деңгел <span id="level-num">1</span></span>
+          <span id="xp-label-text">0 / 100 XP</span>
+        </div>
+        <div class="p-xp-track">
+          <div class="p-xp-fill" id="xp-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="p-stats" id="stats-grid"></div>
+
+    <!-- Achievements -->
+    <div class="p-section-hd">
+      <span>🏆 Жетишкендиктер</span>
+      <div class="p-section-hd-line"></div>
+    </div>
+    <div class="p-ach-grid" id="achievements-grid"></div>
+
+    <!-- Logout -->
+    <button class="p-logout" onclick="logout()">🚪 Чыгуу</button>
+  </main>
+
+  <div id="bottom-nav-mount"></div>
+</div>
+
+<script src="/js/data.js"></script>
+<script src="/js/app.js"></script>
+<script>
+(async () => {
+  requireAuth();
+  await Store.init();
+  const u = Store.user;
+  const state = u?.state || {};
+
+  renderTopNav(document.getElementById('top-bar'));
+  renderSideNav(document.getElementById('sidenav-mount'));
+  renderBottomNav(document.getElementById('bottom-nav-mount'));
+  updateNavStats();
+
+  document.getElementById('profile-name').textContent  = u?.name || 'Колдонуучу';
+  document.getElementById('profile-email').textContent = u?.email || '';
+
+  const xp     = state.xp || 0;
+  const league = getLeague(xp);
+  const level  = getLevel(xp);
+  const xpFor  = (level - 1) * 100;
+  const xpNext = level * 100;
+  const pct    = ((xp - xpFor) / (xpNext - xpFor)) * 100;
+
+  document.getElementById('level-num').textContent     = level;
+  document.getElementById('xp-label-text').textContent = `${xp - xpFor} / 100 XP`;
+  setTimeout(() => { document.getElementById('xp-fill').style.width = Math.min(pct, 100) + '%'; }, 200);
+
+  const badge = document.getElementById('league-badge');
+  badge.textContent        = `${league.emoji} ${league.name}`;
+  badge.style.color        = league.color;
+  badge.style.borderColor  = league.color;
+  badge.style.background   = league.color + '18';
+
+  const completed = state.completedLessons || [];
+  const statColors = ['#FF9600','#FFD900','#FF4B4B','#1CB0F6','#58CC02','#CE82FF'];
+  const stats = [
+    { icon:'🔥', value: state.streak || 0,        label:'Серия', color: statColors[0] },
+    { icon:'⭐', value: xp,                        label:'XP',    color: statColors[1] },
+    { icon:'❤️', value: state.hearts ?? 5,         label:'Жүрөк', color: statColors[2] },
+    { icon:'💎', value: state.gems || 0,           label:'Алмаз', color: statColors[3] },
+    { icon:'📚', value: completed.length,          label:'Сабак', color: statColors[4] },
+    { icon:'🎯', value: state.perfectLessons || 0, label:'Мыкты', color: statColors[5] },
+  ];
+
+  document.getElementById('stats-grid').innerHTML = stats.map((s, i) => `
+    <div class="p-stat slide-up" style="animation-delay:${i * 0.06}s">
+      <div class="p-stat-icon">${s.icon}</div>
+      <div class="p-stat-val" style="color:${s.color}">${s.value}</div>
+      <div class="p-stat-lbl">${s.label}</div>
+    </div>`).join('');
+
+  const unlocked = state.achievements || [];
+  document.getElementById('achievements-grid').innerHTML = FL_ACHIEVEMENTS.map((a, i) => {
+    const done = unlocked.includes(a.id);
+    return `<div class="p-ach ${done ? 'done' : 'locked'}" style="animation-delay:${i * 0.04}s">
+      <span class="p-ach-emoji">${done ? a.emoji : '🔒'}</span>
+      <div class="p-ach-title">${a.title}</div>
+      <div class="p-ach-desc">${a.desc}</div>
+    </div>`;
+  }).join('');
+})();
+
+async function logout() {
+  if (confirm('Чыгуу?')) { Store.logout(); location.href = '/'; }
+}
+</script>
+</body>
+</html>

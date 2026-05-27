@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FinLingvo — Сабак</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div class="lesson-layout">
+
+  <!-- HEADER -->
+  <header class="lesson-hdr">
+    <button class="close-btn" onclick="showQuitModal()">✕</button>
+    <div class="lesson-prog-bar">
+      <div class="lesson-prog-fill" id="prog-fill" style="width:0%;"></div>
+    </div>
+    <div class="hearts-row" id="hearts-row"></div>
+  </header>
+
+  <!-- BODY -->
+  <div class="lesson-body" id="lesson-body">
+    <div style="display:flex;align-items:center;justify-content:center;height:60vh;">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK -->
+  <div class="feedback-panel" id="feedback-panel">
+    <span id="fb-icon" class="fb-icon">🎉</span>
+    <div class="fb-body">
+      <div id="fb-title" class="fb-title">Туура!</div>
+      <div id="fb-text"  class="fb-text"></div>
+    </div>
+    <button id="fb-btn" class="fb-btn c" onclick="nextQ()">УЛАНТУУ</button>
+  </div>
+
+</div>
+
+<!-- QUIT MODAL -->
+<div class="modal-overlay" id="quit-modal" style="display:none;">
+  <div class="modal-card">
+    <div style="font-size:3rem;margin-bottom:0.8rem;">😢</div>
+    <h2 style="font-size:1.2rem;font-weight:900;margin-bottom:0.5rem;">Чыккыңыз келеби?</h2>
+    <p style="color:#7a859e;font-size:0.82rem;font-weight:600;margin-bottom:1.4rem;">Прогрессиңиз жоголот!</p>
+    <button class="btn-primary" style="background:#FF4B4B;box-shadow:0 4px 16px rgba(255,75,75,0.3);margin-bottom:0.6rem;" onclick="quitLesson()">ИЯ, ЧЫГУУ</button>
+    <button class="btn-secondary" style="margin-bottom:0;" onclick="document.getElementById('quit-modal').style.display='none'">УЛАНТТЫРУУ</button>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if (!AUTH.isLoggedIn()) window.location.href = 'index.html';
+
+  const ls = APP.getLessonState();
+  if (!ls) window.location.href = 'learn.html';
+
+  let curQ = 0, correctCnt = 0, wrongCnt = 0, answered = false, selected = null;
+  const qs = ls.questions;
+  let user = AUTH.getUser();
+
+  APP.audio.init();
+
+  // ── Hearts ──────────────────────────────────────────
+  function renderHearts() {
+    user = AUTH.getUser();
+    const hr = document.getElementById('hearts-row');
+    hr.innerHTML = Array.from({length: user.maxHearts}, (_, i) =>
+      `<span class="heart-i${i >= user.hearts ? ' lost' : ''}">❤️</span>`
+    ).join('');
+  }
+  renderHearts();
+
+  // ── Progress ────────────────────────────────────────
+  function updateProg() {
+    document.getElementById('prog-fill').style.width = Math.round(curQ / qs.length * 100) + '%';
+  }
+
+  // ── Render question ─────────────────────────────────
+  function renderQ() {
+    updateProg();
+    answered = false; selected = null;
+    const fp = document.getElementById('feedback-panel');
+    fp.classList.remove('show');
+
+    const q = qs[curQ];
+    const body = document.getElementById('lesson-body');
+    const typeLabels = {
+      multiple_choice: 'ТУУРА ЖООП ТАНДОО',
+      true_false: 'ЧЫН ЖЕ ЖАЛГАН?',
+      fill_blank: 'БОШТУКТУ ТОЛ'
+    };
+
+    let html = `
+      <div style="animation:slide-up 0.35s ease;">
+        <div class="q-type-tag">
+          <span>${typeLabels[q.type] || 'СУРОО'}</span>
+          <span>${curQ+1} / ${qs.length}</span>
+        </div>
+        <div class="q-card"><p class="q-text">${q.question}</p></div>
+    `;
+
+    if (q.type === 'multiple_choice') html += renderMC(q);
+    else if (q.type === 'true_false')  html += renderTF(q);
+    else if (q.type === 'fill_blank')  html += renderFB(q);
+
+    if (q.hint) html += `
+      <button class="hint-btn" onclick="toggleHint()">💡 Жардам</button>
+      <div class="hint-box" id="hint-box">${q.hint}</div>
+    `;
+
+    html += `<div style="height:0.8rem;"></div>`;
+    html += `<button class="check-btn" id="check-btn" onclick="checkAnswer()" disabled>ТЕКШЕР</button>`;
+    html += `</div>`;
+    body.innerHTML = html;
+    body.scrollTop = 0;
+  }
+
+  function renderMC(q) {
+    const L = ['A','B','C','D'];
+    return `<div class="opts">` +
+      q.options.map((o, i) => `
+        <button class="opt-btn" onclick="selOpt(this,${i})" data-i="${i}">
+          <span class="opt-letter">${L[i]}</span>
+          <span>${o.text}</span>
+        </button>`).join('') +
+      `</div>`;
+  }
+
+  function renderTF(q) {
+    return `
+      <div class="tf-wrap">
+        <button class="tf-btn true-btn" onclick="selTF(this,true)" type="button">
+          ✅<span class="tf-label">ЧЫН</span>
+        </button>
+        <button class="tf-btn false-btn" onclick="selTF(this,false)" type="button">
+          ❌<span class="tf-label">ЖАЛГАН</span>
+        </button>
+      </div>`;
+  }
+
+  function renderFB(q) {
+    const sentence = q.question.replace('___',
+      `<span id="blank-word" style="color:#1CB0F6;font-weight:900;border-bottom:3px solid #1CB0F6;padding:1px 6px;">___</span>`);
+    return `
+      <div class="q-card" style="margin-bottom:1rem;"><p class="q-text">${sentence}</p></div>
+      <div class="blank-opts">` +
+      q.options.map(o => `
+        <button class="blank-btn" onclick="selBlank(this,'${o}')" data-v="${o}">${o}</button>`).join('') +
+      `</div>`;
+  }
+
+  // ── Select handlers ─────────────────────────────────
+  function selOpt(btn, idx) {
+    if (answered) return;
+    document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selected = idx; armCheck();
+  }
+  function selTF(btn, val) {
+    if (answered) return;
+    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selected = val; armCheck();
+  }
+  function selBlank(btn, val) {
+    if (answered) return;
+    document.querySelectorAll('.blank-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selected = val;
+    const bw = document.getElementById('blank-word');
+    if (bw) bw.textContent = val;
+    armCheck();
+  }
+  function armCheck() {
+    const btn = document.getElementById('check-btn');
+    if (btn) { btn.disabled = false; btn.classList.add('ready'); }
+    APP.audio.play('click');
+  }
+  function toggleHint() {
+    const h = document.getElementById('hint-box');
+    if (h) h.style.display = h.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // ── Check answer ────────────────────────────────────
+  function checkAnswer() {
+    if (answered || selected === null) return;
+    answered = true;
+    const q = qs[curQ];
+    let ok = false, correctText = '';
+
+    if (q.type === 'multiple_choice') {
+      const ci = q.options.findIndex(o => o.correct);
+      ok = selected === ci;
+      correctText = q.options[ci].text;
+      document.querySelectorAll('.opt-btn').forEach((b, i) => {
+        b.disabled = true;
+        if (i === ci) b.classList.add('correct');
+        if (i === selected && !ok) b.classList.add('wrong');
+      });
+    } else if (q.type === 'true_false') {
+      ok = selected === q.correct;
+      correctText = q.correct ? 'Чын' : 'Жалган';
+      document.querySelectorAll('.tf-btn').forEach(b => {
+        b.disabled = true;
+        const bv = b.classList.contains('true-btn');
+        if (bv === q.correct) b.classList.add('correct');
+        if (b.classList.contains('selected') && !ok) b.classList.add('wrong');
+      });
+    } else if (q.type === 'fill_blank') {
+      ok = selected === q.answer;
+      correctText = q.answer;
+      document.querySelectorAll('.blank-btn').forEach(b => {
+        b.disabled = true;
+        if (b.dataset.v === q.answer) b.classList.add('correct');
+        if (b.dataset.v === selected && !ok) b.classList.add('wrong');
+      });
+      const bw = document.getElementById('blank-word');
+      if (bw) { bw.textContent = ok ? selected : q.answer; bw.style.color = ok ? '#58CC02' : '#FF4B4B'; }
+    }
+
+    document.getElementById('check-btn').style.display = 'none';
+
+    if (ok) {
+      correctCnt++;
+      spawnXP('+10 XP');
+      showFeedback(true, q.explanation);
+    } else {
+      wrongCnt++;
+      const rem = AUTH.loseHeart();
+      user = AUTH.getUser();
+      renderHearts();
+      APP.audio.play('wrong');
+      showFeedback(false, `${q.explanation || ''}`, correctText);
+      if (rem <= 0) setTimeout(showGameOver, 2200);
+    }
+  }
+
+  function spawnXP(txt) {
+    const el = document.createElement('div');
+    el.className = 'xp-pop';
+    el.textContent = txt;
+    el.style.cssText = `left:${30+Math.random()*40}%;top:38%;`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1500);
+    APP.audio.play('correct');
+  }
+
+  function showFeedback(ok, explanation, correctText) {
+    const panel = document.getElementById('feedback-panel');
+    panel.className = `feedback-panel ${ok ? 'correct' : 'wrong'}`;
+    document.getElementById('fb-icon').textContent = ok ? '🎉' : '💔';
+    document.getElementById('fb-title').textContent = ok ? 'Туура!' : 'Туура эмес!';
+    document.getElementById('fb-text').textContent = explanation || (ok ? '' : `Туура жооп: ${correctText}`);
+    document.getElementById('fb-btn').className = `fb-btn ${ok ? 'c' : 'w'}`;
+    panel.style.display = 'flex';
+    requestAnimationFrame(() => panel.classList.add('show'));
+  }
+
+  function nextQ() {
+    const p = document.getElementById('feedback-panel');
+    p.classList.remove('show');
+    setTimeout(() => { p.style.display = 'none'; }, 400);
+    curQ++;
+    if (curQ >= qs.length) finishLesson();
+    else setTimeout(renderQ, 200);
+  }
+
+  function finishLesson() {
+    const perfect = wrongCnt === 0;
+    const stars = wrongCnt === 0 ? 3 : wrongCnt <= 2 ? 2 : 1;
+    const baseXP = ls.xpReward || 50;
+    const bonus = perfect ? 25 : 0;
+    const totalXP = baseXP + correctCnt * 10 + bonus;
+    const earned = AUTH.addXP(totalXP);
+    AUTH.addGems(ls.gemReward || 10);
+    AUTH.updateProgress(ls.lessonId, stars, perfect);
+    APP.saveResult({
+      lessonId: ls.lessonId,
+      lessonTitle: ls.lessonTitle,
+      moduleTitle: ls.moduleTitle,
+      xpEarned: earned || totalXP,
+      gemsEarned: ls.gemReward || 10,
+      correctCount: correctCnt,
+      wrongCount: wrongCnt,
+      totalQuestions: qs.length,
+      stars, perfect, bonusXP: bonus
+    });
+    APP.audio.play('complete');
+    APP.clearLessonState();
+    window.location.href = 'result.html';
+  }
+
+  function showGameOver() {
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="modal-overlay" style="animation:fade-in 0.3s ease;">
+        <div class="modal-card">
+          <div style="font-size:3rem;margin-bottom:0.8rem;animation:bounce-in 0.5s ease;">💔</div>
+          <h2 style="font-size:1.2rem;font-weight:900;margin-bottom:0.5rem;">Жандар бүттү!</h2>
+          <p style="color:#7a859e;font-size:0.82rem;font-weight:600;margin-bottom:1.4rem;">Кайра аракет кылуу үчүн жан алыңыз</p>
+          <button class="btn-primary" style="margin-bottom:0.6rem;" onclick="window.location.href='shop.html'">💎 ЖАНДАРДЫ АЛ</button>
+          <button class="btn-secondary" style="margin-bottom:0;" onclick="window.location.href='learn.html'">← ҮЙРӨНҮҮГӨ</button>
+        </div>
+      </div>`);
+  }
+
+  function showQuitModal() { document.getElementById('quit-modal').style.display = 'flex'; }
+  function quitLesson() { APP.clearLessonState(); window.location.href = 'learn.html'; }
+
+  renderQ();
+</script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FinLingvo — Орнотуулар</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .danger-item { color: #FF4B4B !important; }
+    .danger-item:hover { background: rgba(255,75,75,0.06) !important; }
+    .version-text { text-align:center;padding:2rem 1rem;color:var(--text3);font-size:0.75rem;font-weight:600;line-height:1.8; }
+    .edit-btn {
+      padding:0.42rem 0.9rem;
+      border-radius:99px;
+      border:1.5px solid var(--border2);
+      background:var(--card2);
+      color:var(--text2);
+      font-weight:800;
+      font-size:0.78rem;
+      cursor:pointer;
+      white-space:nowrap;
+      transition:all 0.2s;
+      font-family:'Nunito',sans-serif;
+      flex-shrink:0;
+    }
+    .edit-btn:hover { color:var(--text);border-color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <a href="learn.html" class="sidebar-logo" style="text-decoration:none;">
+      <div class="sidebar-logo-icon">🦅</div>
+      <div><div class="sidebar-logo-title">FinLingo</div><div class="sidebar-logo-sub">Финансылык саббатулук оюну</div></div>
+    </a>
+    <nav style="flex:1;">
+      <a href="learn.html"       class="nav-item"><span class="nav-icon">📚</span>Үйрөнүү</a>
+      <a href="leaderboard.html" class="nav-item"><span class="nav-icon" style="font-size:0.95rem;">📊</span>Лига</a>
+      <a href="shop.html"        class="nav-item"><span class="nav-icon">🛒</span>Дүкөн</a>
+      <a href="profile.html"     class="nav-item"><span class="nav-icon">👤</span>Профиль</a>
+      <a href="settings.html"    class="nav-item active"><span class="nav-icon">⚙️</span>Орнотуу</a>
+    </nav>
+    <div id="sidebar-user" style="padding:0.6rem;border-top:1px solid rgba(255,255,255,0.06);"></div>
+  </aside>
+
+  <div class="main-content">
+    <div class="top-stats">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <div style="flex:1;"></div>
+      <div class="stat-pill streak">🔥 <span id="stat-streak">0</span></div>
+      <div class="stat-pill gems">💎 <span id="stat-gems">0</span></div>
+      <div class="stat-pill hearts">❤️ <span id="stat-hearts">5</span></div>
+    </div>
+
+    <div class="page-wrap" style="max-width:640px;">
+
+      <h1 style="font-size:1.5rem;font-weight:900;margin-bottom:1.4rem;animation:slide-up 0.4s ease both;">⚙️ Орнотуулар</h1>
+
+      <!-- Profile Section -->
+      <div class="settings-section" style="animation:slide-up 0.4s ease both;">
+        <div class="settings-section-hdr">ПРОФИЛЬ</div>
+
+        <div class="settings-item">
+          <div>
+            <div class="settings-item-lbl" id="display-name">Ат: —</div>
+            <div class="settings-item-sub">Профилдеги аты</div>
+          </div>
+          <button onclick="editName()" class="edit-btn">Өзгөртүү</button>
+        </div>
+
+        <div class="settings-item" id="name-edit-row" style="display:none;">
+          <input type="text" id="name-input" class="input-field" style="margin:0;flex:1;padding:0.6rem 1rem;" placeholder="Жаңы атыңыз">
+          <button onclick="saveName()" class="buy-btn" style="width:auto;margin:0 0 0 0.6rem;padding:0.6rem 1rem;">Сакта</button>
+        </div>
+
+        <div class="settings-item">
+          <div>
+            <div class="settings-item-lbl" id="display-email">Email: —</div>
+            <div class="settings-item-sub">Аккаунт emailи</div>
+          </div>
+          <span style="font-size:0.75rem;color:var(--text3);font-weight:700;">🔒</span>
+        </div>
+
+        <div class="settings-item" onclick="window.location.href='shop.html'" style="cursor:pointer;">
+          <div>
+            <div class="settings-item-lbl">Аватар</div>
+            <div class="settings-item-sub" id="display-avatar">🦅 Демейки</div>
+          </div>
+          <button class="edit-btn">Дүкөн</button>
+        </div>
+      </div>
+
+      <!-- Daily goal -->
+      <div class="settings-section" style="animation:slide-up 0.4s ease 0.07s both;">
+        <div class="settings-section-hdr">КҮНДӨЛҮК МАКСАТ</div>
+        <div style="padding:1rem;">
+          <p style="font-size:0.82rem;font-weight:600;color:#7a859e;margin-bottom:0.9rem;">Күн сайын канча XP жыйнагыңыз келет?</p>
+          <div style="display:flex;gap:0.55rem;" id="goal-options">
+            <button class="goal-opt" data-val="5" onclick="selectGoal(5, this)">
+              <span style="font-size:1.3rem;">🐢</span><br>5 XP<br><span style="font-size:0.62rem;color:#3d4860;">Минималдуу</span>
+            </button>
+            <button class="goal-opt" data-val="10" onclick="selectGoal(10, this)">
+              <span style="font-size:1.3rem;">🐇</span><br>10 XP<br><span style="font-size:0.62rem;color:#3d4860;">Жөнөкөй</span>
+            </button>
+            <button class="goal-opt" data-val="20" onclick="selectGoal(20, this)">
+              <span style="font-size:1.3rem;">🦅</span><br>20 XP<br><span style="font-size:0.62rem;color:#1CB0F6;">Сунушталат</span>
+            </button>
+            <button class="goal-opt" data-val="50" onclick="selectGoal(50, this)">
+              <span style="font-size:1.3rem;">🚀</span><br>50 XP<br><span style="font-size:0.62rem;color:#FF9600;">Интенсив</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audio & Notifications -->
+      <div class="settings-section" style="animation:slide-up 0.4s ease 0.12s both;">
+        <div class="settings-section-hdr">АУДИО ЖАНА БИЛДИРҮҮ</div>
+
+        <div class="settings-item">
+          <div>
+            <div class="settings-item-lbl">🔊 Тыбыш эффекттери</div>
+            <div class="settings-item-sub">Туура/туура эмес тыбыштар</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-sound" onchange="saveSetting('sound', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div>
+            <div class="settings-item-lbl">🔔 Билдирүүлөр</div>
+            <div class="settings-item-sub">Күндөлүк эскертме</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-notifications" onchange="saveSetting('notifications', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div>
+            <div class="settings-item-lbl">🎉 Анимациялар</div>
+            <div class="settings-item-sub">Конфетти жана эффекттер</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-animations" checked onchange="saveSetting('animations', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Learning preferences -->
+      <div class="settings-section" style="animation:slide-up 0.4s ease 0.17s both;">
+        <div class="settings-section-hdr">ОКУУ ЖӨНДӨМДӨРҮ</div>
+
+        <div class="settings-item">
+          <div>
+            <div class="settings-item-lbl">💡 Жардам кнопкасы</div>
+            <div class="settings-item-sub">Суроолордо жардам берет</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-hints" checked onchange="saveSetting('hints', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div>
+            <div class="settings-item-lbl">⏱️ Убакыт чектөөсү</div>
+            <div class="settings-item-sub">Суроолорго убакыт берилет</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-timer" onchange="saveSetting('timer', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="settings-section" style="animation:slide-up 0.4s ease 0.22s both;">
+        <div class="settings-section-hdr">СТАТИСТИКА</div>
+
+        <div class="settings-item" style="cursor:default;">
+          <div><div class="settings-item-lbl">📊 Жалпы XP</div></div>
+          <span style="font-weight:900;color:#58CC02;" id="stat-total-xp">0</span>
+        </div>
+
+        <div class="settings-item" style="cursor:default;">
+          <div><div class="settings-item-lbl">✅ Аяктаган сабактар</div></div>
+          <span style="font-weight:900;color:#1CB0F6;" id="stat-total-lessons">0</span>
+        </div>
+
+        <div class="settings-item" style="cursor:default;">
+          <div><div class="settings-item-lbl">🏅 Жетишкендиктер</div></div>
+          <span style="font-weight:900;color:#FFD900;" id="stat-total-achievements">0</span>
+        </div>
+
+        <div class="settings-item" style="cursor:default;">
+          <div><div class="settings-item-lbl">📅 Каттоо датасы</div></div>
+          <span style="font-weight:700;font-size:0.82rem;color:#3d4860;" id="stat-created">—</span>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="settings-section" style="animation:slide-up 0.4s ease 0.27s both;">
+        <div class="settings-section-hdr" style="color:#FF4B4B;">КОРКУНУЧТУУ ЗОН</div>
+
+        <div class="settings-item danger-item" onclick="confirmReset()">
+          <div>
+            <div class="settings-item-lbl" style="color:#FF4B4B;">🔄 Прогрессти тазалоо</div>
+            <div class="settings-item-sub">Бардык прогресс жоголот!</div>
+          </div>
+          <span style="color:#FF4B4B;font-size:1.1rem;">›</span>
+        </div>
+
+        <div class="settings-item danger-item" onclick="confirmLogout()">
+          <div>
+            <div class="settings-item-lbl" style="color:#FF4B4B;">🚪 Чыгуу</div>
+            <div class="settings-item-sub">Аккаунттан чыгуу</div>
+          </div>
+          <span style="color:#FF4B4B;font-size:1.1rem;">›</span>
+        </div>
+      </div>
+
+      <div class="version-text">
+        🦅 FinLingvo v1.0.0<br>
+        Финансылык сабаттуулук платформасы<br>
+        <span style="color:#1CB0F6;">Made with ❤️ in Kyrgyzstan</span>
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    <div class="mob-nav-items">
+      <a href="learn.html"       class="mob-nav-item"><span class="ico">📚</span>Үйрөнүү</a>
+      <a href="leaderboard.html" class="mob-nav-item"><span class="ico">🏆</span>Лига</a>
+      <a href="shop.html"        class="mob-nav-item"><span class="ico">🛒</span>Дүкөн</a>
+      <a href="profile.html"     class="mob-nav-item"><span class="ico">👤</span>Профиль</a>
+    </div>
+  </nav>
+
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if (!AUTH.isLoggedIn()) window.location.href = 'index.html';
+  const user = AUTH.getUser();
+  APP.updateHeaderStats();
+
+  function sidebarUser() {
+    const u = AUTH.getUser(), league = LEAGUES.find(l => l.id === u.league) || LEAGUES[0];
+    document.getElementById('sidebar-user').innerHTML = `<div style="display:flex;align-items:center;gap:0.65rem;padding:0.5rem;"><div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(145deg,#162240,#0b1628);display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:2px solid rgba(28,176,246,0.3);flex-shrink:0;">${u.avatar||'🦅'}</div><div><div style="font-weight:800;font-size:0.85rem;">${u.name}</div><div style="font-size:0.65rem;color:#7a859e;">${league.icon} ${league.name} · ${u.xp} XP</div></div></div>`;
+  }
+  sidebarUser();
+
+  function openSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('mob-overlay').classList.add('show'); }
+  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('mob-overlay').classList.remove('show'); }
+
+  function loadSettings() {
+    const u = AUTH.getUser();
+    const s = u.settings || {};
+
+    document.getElementById('display-name').textContent = `Ат: ${u.name}`;
+    document.getElementById('display-email').textContent = `Email: ${u.email || '—'}`;
+    document.getElementById('display-avatar').textContent = `${u.avatar || '🦅'} ${u.avatarId && u.avatarId !== 'default' ? 'Атайын' : 'Демейки'}`;
+
+    document.getElementById('toggle-sound').checked       = s.sound !== false;
+    document.getElementById('toggle-notifications').checked = s.notifications !== false;
+    document.getElementById('toggle-animations').checked  = s.animations !== false;
+    document.getElementById('toggle-hints').checked       = s.hints !== false;
+    document.getElementById('toggle-timer').checked       = !!s.timer;
+
+    // Daily goal
+    const goal = s.dailyGoal || 10;
+    document.querySelectorAll('.goal-opt').forEach(btn => {
+      if (parseInt(btn.dataset.val) === goal) btn.classList.add('sel');
+    });
+
+    // Stats
+    document.getElementById('stat-total-xp').textContent = u.xp.toLocaleString();
+    const completedLessons = Object.values(u.progress || {}).filter(p => p.completed).length;
+    document.getElementById('stat-total-lessons').textContent = completedLessons;
+    document.getElementById('stat-total-achievements').textContent = (u.achievements || []).length;
+    if (u.createdAt) {
+      const date = new Date(u.createdAt);
+      document.getElementById('stat-created').textContent = date.toLocaleDateString('ru-RU');
+    }
+  }
+
+  function saveSetting(key, value) {
+    const u = AUTH.getUser();
+    if (!u.settings) u.settings = {};
+    u.settings[key] = value;
+    AUTH.saveUser(u);
+    if (APP.toast) APP.toast.show('Сакталды ✓', 'success', 1500);
+    APP.audio.play('click');
+  }
+
+  function selectGoal(val, btn) {
+    document.querySelectorAll('.goal-opt').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    saveSetting('dailyGoal', val);
+  }
+
+  function editName() {
+    const row = document.getElementById('name-edit-row');
+    row.style.display = 'flex';
+    const inp = document.getElementById('name-input');
+    inp.value = AUTH.getUser().name;
+    inp.focus();
+  }
+
+  function saveName() {
+    const newName = document.getElementById('name-input').value.trim();
+    if (!newName) { APP.toast.show('Ат бош болуп калды!', 'error'); return; }
+
+    const u = AUTH.getUser();
+    u.name = newName;
+    AUTH.saveUser(u);
+
+    document.getElementById('display-name').textContent = `Ат: ${newName}`;
+    document.getElementById('name-edit-row').style.display = 'none';
+    APP.toast.show('Аты өзгөрттүрүлдү ✓', 'success');
+    sidebarUser();
+    APP.updateHeaderStats();
+  }
+
+  function confirmReset() {
+    if (confirm('Чынбы? Бардык прогрессиңиз, XP жана Gems жоголот!')) {
+      const u = AUTH.getUser();
+      u.xp = 0;
+      u.gems = 130;
+      u.hearts = 5;
+      u.streak = 0;
+      u.weeklyXP = 0;
+      u.progress = {};
+      u.achievements = [];
+      u.level = 1;
+      u.league = 'bronze';
+      AUTH.saveUser(u);
+      APP.toast.show('Прогресс тазаланды', 'warning');
+      setTimeout(() => window.location.href = 'learn.html', 1500);
+    }
+  }
+
+  function confirmLogout() {
+    if (confirm('Чыккыңыз келеби?')) AUTH.logout();
+  }
+
+  loadSettings();
+</script>
+</body>
+</html>

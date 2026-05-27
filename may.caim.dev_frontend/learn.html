@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Окуу жолу — FinLingvo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* ── Page shell ── */
+.learn-page{display:flex;min-height:100vh;background:var(--bg)}
+.learn-main{flex:1;padding:0 0 120px;width:100%;box-sizing:border-box;}
+.learn-inner{max-width:640px;margin:0 auto;padding:16px 16px 0}
+
+@media(min-width:769px){
+  .learn-main{margin-left:240px;padding-bottom:60px;}
+  .learn-inner{padding:32px 24px 0}
+}
+
+/* ── League / user banner ── */
+.league-banner{border-radius:20px;padding:18px 20px;margin-bottom:20px;position:relative;overflow:hidden;
+  background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);backdrop-filter:blur(12px)}
+.league-banner-glow{position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;opacity:.18;filter:blur(32px)}
+.league-banner-inner{position:relative;display:flex;align-items:center;gap:14px}
+.league-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;border:2px solid}
+.league-info{flex:1;min-width:0}
+.league-label{font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.league-name{font-size:1.05rem;font-weight:900;margin-bottom:8px}
+.league-bar{height:8px;border-radius:100px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:4px}
+.league-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--green),#7fff00);transition:width .8s ease}
+.league-bar-hint{font-size:.68rem;color:var(--muted);font-weight:600}
+
+/* ── Module section ── */
+.mod-section{margin-bottom:36px;opacity:0;transform:translateY(14px);transition:opacity .4s ease,transform .4s ease}
+.mod-section.visible{opacity:1;transform:none}
+
+/* Module header card */
+.mod-header{border-radius:18px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.mod-header-left{display:flex;align-items:center;gap:12px}
+.mod-header-icon{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.mod-header-icon svg{width:24px;height:24px}
+.mod-header-num{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.75);margin-bottom:1px}
+.mod-header-title{font-size:1.05rem;font-weight:900;color:#fff;line-height:1.2}
+.mod-header-right{text-align:right;color:#fff;flex-shrink:0}
+.mod-header-count{font-size:1.2rem;font-weight:900;line-height:1}
+.mod-header-pct{font-size:.68rem;opacity:.75;font-weight:700}
+
+/* ── Lesson nodes ── */
+.nodes-col{display:flex;flex-direction:column;align-items:center;gap:20px;padding:0 0 8px}
+.node-row{position:relative;width:100%;display:flex;justify-content:center}
+.node-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
+
+/* БАШТА floating badge */
+.node-badge{position:absolute;top:-32px;left:50%;transform:translateX(-50%);
+  font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+  padding:4px 10px;border-radius:8px;background:#fff;color:var(--green);
+  white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);animation:badgeBob .9s ease-in-out infinite alternate}
+@keyframes badgeBob{from{transform:translateX(-50%) translateY(0)}to{transform:translateX(-50%) translateY(-4px)}}
+
+/* Node button */
+.node-btn{width:80px;height:80px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;transition:transform .15s;flex-shrink:0}
+.node-btn:active:not(:disabled){transform:translateY(3px)}
+.node-btn:disabled{cursor:not-allowed}
+.node-btn svg{pointer-events:none}
+.node-btn.state-completed{background:#FFD900;color:#1a1a1a;box-shadow:0 6px 0 #b89b00,0 12px 32px -12px rgba(255,217,0,.5)}
+.node-btn.state-current  {background:var(--green);color:#fff;box-shadow:0 6px 0 rgb(66,182,0),0 12px 32px -12px rgba(88,204,2,.6)}
+.node-btn.state-locked   {background:#2A3148;color:#6b7488;box-shadow:0 5px 0 #1A1F30;opacity:.7}
+.node-label{font-size:.7rem;color:var(--muted);font-weight:700;text-align:center;max-width:100px;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Streak banner */
+.streak-banner{background:linear-gradient(135deg,#FF9600,#FFD700);border-radius:16px;
+  padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px;cursor:pointer;
+  box-shadow:0 4px 0 rgba(0,0,0,.15),0 12px 30px -10px rgba(255,150,0,.5)}
+.streak-banner-fire{font-size:2rem}
+.streak-banner-text strong{font-size:1rem;font-weight:900;color:#fff;display:block}
+.streak-banner-text span{font-size:.78rem;color:rgba(255,255,255,.85);font-weight:600}
+.streak-banner-arrow{margin-left:auto;color:#fff;font-size:1.3rem;font-weight:900}
+</style>
+</head>
+<body>
+<div class="learn-page">
+  <div id="sidenav-mount"></div>
+
+  <main class="learn-main">
+    <div id="top-bar"></div>
+
+    <div class="learn-inner">
+      <div id="league-area"></div>
+      <div id="streak-area"></div>
+      <div id="path-container"></div>
+    </div>
+  </main>
+
+  <div id="bottom-nav-mount"></div>
+</div>
+
+<script src="/js/data.js"></script>
+<script src="/js/app.js"></script>
+<script>
+/* ── Module SVG icons ── */
+const MOD_ICONS = [
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>`,
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>`,
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><path d="M16 11h.01"/></svg>`,
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9.5 8h5"/><path d="M9.5 12H16"/><path d="M9.5 16H14"/></svg>`,
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`,
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>`,
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>`,
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>`,
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg>`,
+];
+
+const LOCK_SVG = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+const STAR_SVG = `<svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>`;
+const COINS_SVG = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>`;
+
+/* zigzag offsets cycling pattern */
+const OFFSETS = [0, 60, 40, -40, -60];
+
+(async () => {
+  requireAuth();
+  await Store.init();
+  const u = Store.user;
+  const s = u?.state || {};
+
+  renderTopNav(document.getElementById('top-bar'));
+  renderSideNav(document.getElementById('sidenav-mount'));
+  renderBottomNav(document.getElementById('bottom-nav-mount'));
+  updateNavStats();
+
+  /* ── League banner ── */
+  const xp = s.xp || 0;
+  const league = getLeague(xp);
+  const nextLeague = FL_LEAGUES.find(l => l.minXP > xp);
+  const toNext = nextLeague ? nextLeague.minXP - xp : 0;
+  const pct = nextLeague ? Math.round(((xp - league.minXP) / (nextLeague.minXP - league.minXP)) * 100) : 100;
+  document.getElementById('league-area').innerHTML = `
+    <div class="league-banner">
+      <div class="league-banner-glow" style="background:${league.color||'#58CC02'}"></div>
+      <div class="league-banner-inner">
+        <div class="league-icon" style="background:${(league.color||'#58CC02')}22;border-color:${(league.color||'#58CC02')}66">
+          <span style="font-size:1.6rem">${league.emoji}</span>
+        </div>
+        <div class="league-info">
+          <div class="league-label" style="color:${league.color||'#58CC02'}">${league.name} лига</div>
+          <div class="league-name">${u?.name || 'Колдонуучу'}</div>
+          <div class="league-bar"><div class="league-bar-fill" style="width:${pct}%;background:${league.color||'#58CC02'}"></div></div>
+          <div class="league-bar-hint">${xp} XP${nextLeague ? ` — ${nextLeague.name} лигага чейин ${toNext} XP` : ' — Эң жогорку лига!'}</div>
+        </div>
+      </div>
+    </div>`;
+
+  /* ── Streak banner ── */
+  const streak = s.streak || 0;
+  if (streak >= 2) {
+    document.getElementById('streak-area').innerHTML = `
+      <div class="streak-banner" onclick="location.href='/profile.html'">
+        <div class="streak-banner-fire">🔥</div>
+        <div class="streak-banner-text">
+          <strong>${streak} күндүк серия!</strong>
+          <span>Жакшы иш, улантып кет!</span>
+        </div>
+        <div class="streak-banner-arrow">›</div>
+      </div>`;
+  }
+
+  /* ── Learning path ── */
+  const completed = s.completedLessons || [];
+  const container = document.getElementById('path-container');
+
+  FL_MODULES.forEach((mod, mi) => {
+    const prog = getModuleProgress(mod.id, completed);
+    const pctDone = prog.total ? Math.round((prog.completed / prog.total) * 100) : 0;
+
+    const section = document.createElement('section');
+    section.className = 'mod-section';
+
+    // Module header
+    const shadow = `rgba(0,0,0,.18) 0px 6px 0px, ${mod.color}88 0px 18px 40px -16px`;
+    section.innerHTML = `
+      <div class="mod-header" style="background:${mod.color};box-shadow:${shadow}">
+        <div class="mod-header-left">
+          <div class="mod-header-icon">${MOD_ICONS[mi] || MOD_ICONS[0]}</div>
+          <div>
+            <div class="mod-header-num">${mod.id}-бөлүм</div>
+            <div class="mod-header-title">${mod.title}</div>
+          </div>
+        </div>
+        <div class="mod-header-right">
+          <div class="mod-header-count">${prog.completed}/${prog.total}</div>
+          <div class="mod-header-pct">${pctDone}%</div>
+        </div>
+      </div>
+      <div class="nodes-col" id="nodes-${mod.id}"></div>`;
+
+    container.appendChild(section);
+
+    const nodesEl = section.querySelector(`#nodes-${mod.id}`);
+    mod.lessons.forEach((lesson, li) => {
+      const isDone    = completed.includes(lesson.id);
+      const unlocked  = isLessonUnlocked(lesson.id, completed);
+      const isCurrent = !isDone && unlocked;
+      const state     = isDone ? 'completed' : isCurrent ? 'current' : 'locked';
+      const offset    = OFFSETS[li % OFFSETS.length];
+
+      const icon = isDone ? STAR_SVG : isCurrent ? COINS_SVG : LOCK_SVG;
+      const badge = isCurrent ? `<div class="node-badge">БАШТА</div>` : '';
+      const clickFn = state !== 'locked' ? `startLesson('${mod.id}','${lesson.id}')` : `showLocked()`;
+
+      const row = document.createElement('div');
+      row.className = 'node-row';
+      row.innerHTML = `
+        <div class="node-wrap" style="transform:translateX(${offset}px)">
+          ${badge}
+          <button class="node-btn state-${state}" onclick="${clickFn}" ${state==='locked'?'disabled':''} title="${lesson.title}">
+            ${icon}
+          </button>
+          <div class="node-label">${lesson.title}</div>
+        </div>`;
+      nodesEl.appendChild(row);
+    });
+
+    // Animate in with IntersectionObserver
+    setTimeout(() => {
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+      }, { threshold: 0.1 });
+      io.observe(section);
+    }, 0);
+  });
+})();
+
+function startLesson(modId, lessonId) {
+  window.location.href = `/lesson.html?module=${modId}&lesson=${lessonId}`;
+}
+function showLocked() {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#2A3148;color:#fff;padding:10px 20px;border-radius:100px;font-weight:800;font-size:.85rem;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.3)';
+  t.textContent = '🔒 Мурунку сабакты аяктаңыз';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
+}
+</script>
+</body>
+</html>
+<style>
+.learn-page{display:flex;min-height:100vh;background:var(--bg)}
+.learn-main{flex:1;padding:24px 16px 100px;width:100%;box-sizing:border-box;}
+@media(min-width:769px){
+  .learn-main{margin-left:240px;padding:32px 0 60px;}
+  .learn-greeting{padding:0 48px;margin-bottom:28px}
+  .learn-greeting h1{font-size:2rem}
+  #streak-area{padding:0 48px}
+  .path-container{max-width:600px;margin:0 auto;padding:0 20px 60px}
+}
+.learn-greeting{margin-bottom:24px}
+.learn-greeting h1{font-size:1.6rem;font-weight:900;margin-bottom:4px}
+.learn-greeting p{color:var(--muted);font-size:.9rem;font-weight:600}
+.module-section{margin-bottom:40px}
+.module-header{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:16px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg)}
+.module-emoji-wrap{width:52px;height:52px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+.module-info{flex:1;min-width:0}
+.module-title{font-weight:900;font-size:1rem;margin-bottom:3px}
+.module-desc{font-size:.8rem;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.module-prog-bar{height:6px;background:var(--border);border-radius:100px;margin-top:6px;overflow:hidden}
+.module-prog-fill{height:100%;border-radius:100px;transition:width .5s ease}
+.module-prog-label{font-size:.72rem;color:var(--muted);font-weight:700;margin-top:3px}
+.lessons-path{display:flex;flex-direction:column;align-items:center;gap:8px;position:relative}
+.lessons-path::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--border);transform:translateX(-50%);z-index:0}
+.lesson-node-wrap{position:relative;z-index:1;display:flex;align-items:center;gap:12px;width:100%}
+.lesson-node-wrap:nth-child(odd){flex-direction:row}
+.lesson-node-wrap:nth-child(even){flex-direction:row-reverse}
+.lesson-node{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;cursor:pointer;transition:all .2s;border:4px solid transparent;flex-shrink:0;position:relative}
+.lesson-node.completed{background:var(--green);box-shadow:0 4px 12px rgba(88,204,2,.35)}
+.lesson-node.current{background:var(--green);box-shadow:0 4px 20px rgba(88,204,2,.5);animation:bobble 2s ease infinite}
+.lesson-node.current::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:3px solid rgba(88,204,2,.4);animation:ping 1.5s ease infinite}
+.lesson-node.locked{background:var(--surface2);color:var(--muted);cursor:not-allowed;border-color:var(--border)}
+.lesson-node-info{flex:1;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:10px 14px;min-width:0}
+.lesson-node-title{font-weight:800;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lesson-node-status{font-size:.75rem;color:var(--muted);font-weight:600;margin-top:2px}
+.lesson-node.completed + .lesson-node-info{border-color:rgba(88,204,2,.3)}
+.lesson-node.current + .lesson-node-info{border-color:var(--green)}
+.streak-banner{background:linear-gradient(135deg,#FF9600,#FFD700);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.streak-banner .fire{font-size:2rem}
+.streak-banner-text strong{font-size:1.1rem;font-weight:900;color:#fff}
+.streak-banner-text span{font-size:.8rem;color:rgba(255,255,255,.85);font-weight:600;display:block}
+@media(min-width:768px){
+  .lesson-node-wrap:nth-child(odd){padding-left:80px}
+  .lesson-node-wrap:nth-child(even){padding-right:80px}
+}
+</style>
+</head>
+<body>
+<div class="learn-page">
+  <div id="sidenav-mount"></div>
+
+  <main class="learn-main">
+    <div id="top-bar"></div>
+
+    <div class="learn-greeting">
+      <h1 id="greeting-text">Кош келдиң! 👋</h1>
+      <p id="greeting-sub">Бүгүн кандай сабак окуйсуң?</p>
+    </div>
+
+    <div id="streak-area"></div>
+
+    <div id="path-container"></div>
+  </main>
+
+  <div id="bottom-nav-mount"></div>
+</div>
+
+<script src="/js/data.js"></script>
+<script src="/js/app.js"></script>
+<script>
+(async () => {
+  requireAuth();
+  await Store.init();
+  const u = Store.user;
+
+  renderTopNav(document.getElementById('top-bar'));
+  renderSideNav(document.getElementById('sidenav-mount'));
+  renderBottomNav(document.getElementById('bottom-nav-mount'));
+  updateNavStats();
+
+  // Greeting
+  const hour = new Date().getHours();
+  const greetings = hour < 12 ? 'Куттуу таң! ☀️' : hour < 17 ? 'Жакшы түш! 🌤️' : 'Жакшы кеч! 🌙';
+  document.getElementById('greeting-text').textContent = u ? `${greetings} ${u.name || ''}` : greetings;
+  document.getElementById('greeting-sub').textContent = u?.state?.streak > 1
+    ? `🔥 ${u.state.streak} күндүк серияң бар! Улантып кет!`
+    : 'Бүгүн финансылык сабат жогорулат!';
+
+  // Streak banner
+  const streak = u?.state?.streak || 0;
+  if (streak >= 2) {
+    document.getElementById('streak-area').innerHTML = `
+      <div class="streak-banner" onclick="location.href='/profile.html'">
+        <div class="fire">🔥</div>
+        <div class="streak-banner-text">
+          <strong>${streak} күндүк серия!</strong>
+          <span>Жакшы иш, улантып кет!</span>
+        </div>
+        <div style="margin-left:auto;font-size:1.5rem">→</div>
+      </div>`;
+  }
+
+  // Render learning path
+  const completed = u?.state?.completedLessons || [];
+  const container = document.getElementById('path-container');
+
+  for (const mod of FL_MODULES) {
+    const prog = getModuleProgress(mod.id, completed);
+    const section = document.createElement('div');
+    section.className = 'module-section';
+
+    section.innerHTML = `
+      <div class="module-header">
+        <div class="module-emoji-wrap" style="background:${mod.color}22">${mod.emoji}</div>
+        <div class="module-info">
+          <div class="module-title">${mod.id}. ${mod.title}</div>
+          <div class="module-desc">${mod.description}</div>
+          <div class="module-prog-bar"><div class="module-prog-fill" style="width:${prog.percent}%;background:${mod.color}"></div></div>
+          <div class="module-prog-label">${prog.completed}/${prog.total} сабак аяктоо</div>
+        </div>
+      </div>
+      <div class="lessons-path" id="path-${mod.id}"></div>`;
+
+    container.appendChild(section);
+
+    const pathEl = section.querySelector(`#path-${mod.id}`);
+    for (const lesson of mod.lessons) {
+      const isDone    = completed.includes(lesson.id);
+      const unlocked  = isLessonUnlocked(lesson.id, completed);
+      const isCurrent = !isDone && unlocked;
+      const state     = isDone ? 'completed' : isCurrent ? 'current' : 'locked';
+      const icon      = isDone ? '✓' : isCurrent ? mod.emoji : '🔒';
+
+      const wrap = document.createElement('div');
+      wrap.className = 'lesson-node-wrap animate-fadeInUp';
+      wrap.innerHTML = `
+        <div class="lesson-node ${state}" onclick="${state !== 'locked' ? `startLesson('${mod.id}','${lesson.id}')` : 'showLocked()'}">${icon}</div>
+        <div class="lesson-node-info">
+          <div class="lesson-node-title">${lesson.title}</div>
+          <div class="lesson-node-status">${isDone ? '✅ Аяктоо' : isCurrent ? '▶ Баштоо' : '🔒 Жабык'}</div>
+        </div>`;
+      pathEl.appendChild(wrap);
+    }
+  }
+})();
+
+function startLesson(modId, lessonId) {
+  window.location.href = `/lesson.html?module=${modId}&lesson=${lessonId}`;
+}
+
+function showLocked() {
+  showToast('🔒 Мурунку сабакты биринчи аяктоо керек!', 'warning');
+}
+</script>
+</body>
+</html>

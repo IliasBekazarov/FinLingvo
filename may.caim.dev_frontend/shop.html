@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дүкөн — FinLingvo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* ── Layout ── */
+.shop-page { display: flex; min-height: 100vh; background: var(--bg); }
+.shop-main { flex: 1; padding: 24px 16px 110px; width: 100%; box-sizing: border-box; }
+@media (min-width: 769px) { .shop-main { margin-left: 240px; padding: 36px 48px 60px; } }
+@media (min-width: 1200px) { .shop-main { padding: 40px 80px 60px; } }
+
+/* ── Sticky Gems Bar ── */
+.shop-gems-bar {
+  position: sticky; top: 68px; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(15,25,35,.85);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  gap: 12px;
+}
+.shop-gems-num {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.3rem; font-weight: 900;
+  color: var(--blue);
+}
+.shop-gems-icon { font-size: 1.5rem; }
+.shop-gems-label { font-size: .8rem; color: var(--muted); font-weight: 700; }
+.shop-title { font-size: 1.4rem; font-weight: 900; }
+
+/* ── Category Tabs ── */
+.shop-tabs {
+  display: flex; gap: 8px; overflow-x: auto;
+  padding-bottom: 6px; margin-bottom: 24px;
+  scrollbar-width: none;
+}
+.shop-tabs::-webkit-scrollbar { display: none; }
+.shop-tab {
+  flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+  padding: 10px 20px; border-radius: 100px;
+  border: 1.5px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  font-size: .9rem; font-weight: 800;
+  color: var(--muted); cursor: pointer;
+  transition: all .2s; white-space: nowrap;
+}
+.shop-tab:hover { border-color: rgba(255,255,255,.15); color: var(--text2); }
+.shop-tab.active {
+  border-color: var(--blue);
+  background: rgba(28,176,246,.12);
+  color: var(--blue);
+  box-shadow: 0 0 16px rgba(28,176,246,.15);
+}
+
+/* ── Section header ── */
+.shop-section-hd {
+  display: flex; align-items: center; gap: 10px;
+  font-size: .95rem; font-weight: 900; color: var(--text2);
+  margin-bottom: 16px;
+}
+.shop-section-line { flex: 1; height: 1.5px; background: linear-gradient(90deg, var(--border), transparent); }
+
+/* ── Shop Grid ── */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  gap: 14px; margin-bottom: 36px;
+}
+@media (min-width: 769px) { .shop-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1200px) { .shop-grid { grid-template-columns: repeat(4, 1fr); } }
+
+/* ── Shop Card ── */
+.shop-card {
+  position: relative; overflow: hidden;
+  background: rgba(255,255,255,.04);
+  border: 1.5px solid rgba(255,255,255,.07);
+  border-radius: 20px; padding: 22px 16px 18px;
+  text-align: center; cursor: pointer;
+  transition: transform .25s cubic-bezier(.22,1,.36,1), border-color .25s, box-shadow .25s;
+}
+.shop-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 60%;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255,255,255,.06), transparent);
+  pointer-events: none;
+}
+.shop-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  border-color: rgba(255,217,0,.4);
+  box-shadow: 0 12px 36px rgba(0,0,0,.35), 0 0 24px rgba(255,217,0,.08);
+}
+.shop-card.owned {
+  border-color: rgba(88,204,2,.35);
+  background: rgba(88,204,2,.05);
+}
+.shop-card.owned:hover {
+  border-color: rgba(88,204,2,.5);
+  box-shadow: 0 12px 36px rgba(0,0,0,.3), 0 0 24px rgba(88,204,2,.1);
+}
+.shop-card-badge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: .65rem; font-weight: 900;
+  background: var(--green); color: #fff;
+  border-radius: 100px; padding: 3px 8px;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+
+.shop-card-emoji { font-size: 2.8rem; margin-bottom: 12px; display: block; }
+.shop-card-name { font-size: .9rem; font-weight: 900; margin-bottom: 5px; }
+.shop-card-desc { font-size: .75rem; color: var(--muted); font-weight: 600; line-height: 1.35; margin-bottom: 14px; }
+.shop-card-price {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 14px; border-radius: 100px;
+  font-size: .88rem; font-weight: 900;
+  border: 1.5px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.06);
+  transition: background .2s;
+}
+.shop-card:hover .shop-card-price { background: rgba(255,255,255,.1); }
+.price-can     { color: var(--yellow); }
+.price-cannot  { color: var(--red); }
+.price-owned   { color: var(--green); }
+
+/* Category section */
+.shop-section { display: block; }
+.shop-section.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="shop-page">
+  <div id="sidenav-mount"></div>
+
+  <main class="shop-main">
+    <div id="top-bar"></div>
+
+    <!-- Sticky gems bar -->
+    <div class="shop-gems-bar">
+      <div>
+        <div class="shop-title">🛍️ Дүкөн</div>
+        <div class="shop-gems-label">Алмаздарыңды жумша</div>
+      </div>
+      <div class="shop-gems-num">
+        <span class="shop-gems-icon">💎</span>
+        <span id="gems-count">0</span>
+      </div>
+    </div>
+
+    <!-- Category tabs -->
+    <div class="shop-tabs">
+      <div class="shop-tab active" onclick="setTab('all')" id="tab-all">🌟 Баары</div>
+      <div class="shop-tab" onclick="setTab('consumable')" id="tab-consumable">⚡ Бир жолу</div>
+      <div class="shop-tab" onclick="setTab('cosmetic')"   id="tab-cosmetic">🎨 Безелиштер</div>
+      <div class="shop-tab" onclick="setTab('upgrade')"    id="tab-upgrade">⬆️ Жакшыртуу</div>
+    </div>
+
+    <!-- Consumable section -->
+    <div class="shop-section" id="sec-consumable">
+      <div class="shop-section-hd">
+        <span>⚡ Бир жолу колдонулуучу</span>
+        <div class="shop-section-line"></div>
+      </div>
+      <div class="shop-grid" id="grid-consumable"></div>
+    </div>
+
+    <!-- Cosmetic section -->
+    <div class="shop-section" id="sec-cosmetic">
+      <div class="shop-section-hd">
+        <span>🎨 Безелиштер</span>
+        <div class="shop-section-line"></div>
+      </div>
+      <div class="shop-grid" id="grid-cosmetic"></div>
+    </div>
+
+    <!-- Upgrade section -->
+    <div class="shop-section" id="sec-upgrade">
+      <div class="shop-section-hd">
+        <span>⬆️ Жакшыртуулар</span>
+        <div class="shop-section-line"></div>
+      </div>
+      <div class="shop-grid" id="grid-upgrade"></div>
+    </div>
+  </main>
+
+  <div id="bottom-nav-mount"></div>
+</div>
+
+<script src="/js/data.js"></script>
+<script src="/js/app.js"></script>
+<script>
+let currentTab = 'all';
+
+(async () => {
+  requireAuth();
+  await Store.init();
+
+  renderTopNav(document.getElementById('top-bar'));
+  renderSideNav(document.getElementById('sidenav-mount'));
+  renderBottomNav(document.getElementById('bottom-nav-mount'));
+  updateNavStats();
+
+  renderShop();
+})();
+
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  ['consumable','cosmetic','upgrade'].forEach(t => {
+    document.getElementById(`sec-${t}`).classList.toggle('hidden', tab !== 'all' && tab !== t);
+  });
+}
+
+function renderShop() {
+  const state = Store.user?.state || {};
+  const gems  = state.gems || 0;
+  const owned = state.ownedItems || [];
+  document.getElementById('gems-count').textContent = gems;
+
+  ['consumable','cosmetic','upgrade'].forEach(type => {
+    const grid  = document.getElementById(`grid-${type}`);
+    const items = FL_SHOP_ITEMS.filter(i => i.type === type);
+    if (!items.length) {
+      grid.innerHTML = '<p style="color:var(--muted);font-size:.85rem;grid-column:1/-1;padding:8px 0">Тезде келет...</p>';
+      return;
+    }
+    grid.innerHTML = items.map(item => {
+      const isOwned   = owned.includes(item.id);
+      const canAfford = gems >= item.price;
+      const priceClass = isOwned ? 'price-owned' : canAfford ? 'price-can' : 'price-cannot';
+      const priceLabel = isOwned ? '✓ Сатып алынган' : `💎 ${item.price}`;
+      return `<div class="shop-card ${isOwned ? 'owned' : ''}" onclick="buyItem('${item.id}')">
+        ${isOwned ? '<span class="shop-card-badge">✓ Бар</span>' : ''}
+        <span class="shop-card-emoji">${item.emoji}</span>
+        <div class="shop-card-name">${item.name}</div>
+        <div class="shop-card-desc">${item.desc}</div>
+        <span class="shop-card-price ${priceClass}">${priceLabel}</span>
+      </div>`;
+    }).join('');
+  });
+}
+
+async function buyItem(itemId) {
+  const item  = FL_SHOP_ITEMS.find(i => i.id === itemId);
+  if (!item) return;
+  const state = Store.user?.state || {};
+  const gems  = state.gems || 0;
+  const owned = state.ownedItems || [];
+  if (owned.includes(itemId)) { showToast('Бул буюм сизде бар!', 'info'); return; }
+  if (gems < item.price) { showToast(`💎 Алмаз жетишпейт! (Керек: ${item.price})`, 'error'); return; }
+  if (!confirm(`"${item.name}" — ${item.price} 💎 үчүн сатып аласызбы?`)) return;
+  try {
+    await Store.buyItem(itemId, item.price);
+    showToast(`${item.emoji} "${item.name}" сатып алынды!`, 'success');
+    document.getElementById('gems-count').textContent = Store.user?.state?.gems || 0;
+    renderShop();
+    updateNavStats();
+  } catch(e) {
+    showToast(e.message || 'Ката болду', 'error');
+  }
+}
+</script>
+</body>
+</html>

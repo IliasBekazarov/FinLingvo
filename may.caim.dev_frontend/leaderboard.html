@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рейтинг — FinLingvo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* ── Layout ── */
+.lb-page { display: flex; min-height: 100vh; background: var(--bg); }
+.lb-main { flex: 1; padding: 24px 16px 110px; width: 100%; box-sizing: border-box; }
+@media (min-width: 769px) { .lb-main { margin-left: 240px; padding: 36px 48px 60px; } }
+@media (min-width: 1200px) { .lb-main { padding: 40px 80px 60px; } }
+
+/* ── Desktop two-col ── */
+.lb-layout {
+  display: flex; flex-direction: column; gap: 24px;
+}
+@media (min-width: 900px) {
+  .lb-layout { flex-direction: row; align-items: flex-start; }
+  .lb-left  { flex: 1; min-width: 0; }
+  .lb-right { width: 280px; flex-shrink: 0; position: sticky; top: 80px; }
+}
+
+/* ── Header ── */
+.lb-header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 24px;
+}
+.lb-header-icon {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, #FFD900, #FF9600);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 6px 0 rgba(255,150,0,.4), 0 12px 24px rgba(255,150,0,.2);
+}
+.lb-header-title  { font-size: 1.5rem; font-weight: 900; }
+.lb-header-sub    { font-size: .85rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
+
+/* ── League pills ── */
+.lb-leagues {
+  display: flex; gap: 8px; overflow-x: auto;
+  scrollbar-width: none; padding-bottom: 4px; margin-bottom: 22px;
+}
+.lb-leagues::-webkit-scrollbar { display: none; }
+.lb-pill {
+  flex-shrink: 0; padding: 8px 16px; border-radius: 100px;
+  font-weight: 800; font-size: .82rem;
+  border: 1.5px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  color: var(--muted); cursor: pointer;
+  transition: all .2s; white-space: nowrap;
+}
+.lb-pill:hover { border-color: rgba(255,255,255,.15); color: var(--text); }
+.lb-pill.active {
+  border-color: var(--green);
+  background: rgba(88,204,2,.12);
+  color: var(--green);
+}
+
+/* ── Podium ── */
+.lb-podium {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 0; margin-bottom: 28px;
+}
+.lb-pod-item {
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1; max-width: 140px;
+}
+.lb-pod-avatar {
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: .95rem;
+  border: 3px solid; margin-bottom: 8px;
+  position: relative;
+}
+.lb-pod-avatar.rank1 {
+  width: 66px; height: 66px;
+  border-color: var(--yellow);
+  background: rgba(255,217,0,.15);
+  box-shadow: 0 0 0 4px rgba(255,217,0,.12), 0 0 24px rgba(255,217,0,.25);
+  font-size: 1.2rem;
+}
+.lb-pod-avatar.rank1::after {
+  content: '👑';
+  position: absolute; top: -18px;
+  font-size: 1.1rem;
+  animation: float 2.5s ease-in-out infinite;
+}
+.lb-pod-avatar.rank2 { width: 52px; height: 52px; border-color: #C0C0C0; background: rgba(192,192,192,.12); }
+.lb-pod-avatar.rank3 { width: 48px; height: 48px; border-color: #CD7F32; background: rgba(205,127,50,.12); }
+
+.lb-pod-name {
+  font-size: .78rem; font-weight: 800;
+  text-align: center; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  margin-bottom: 3px;
+}
+.lb-pod-xp { font-size: .72rem; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+
+.lb-pod-base {
+  width: 100%; border-radius: 12px 12px 0 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; font-weight: 900; color: #fff;
+  padding: 10px 0;
+}
+.lb-pod-base.rank1 { min-height: 90px; background: linear-gradient(180deg, #FFD700, #E5A000); }
+.lb-pod-base.rank2 { min-height: 68px; background: linear-gradient(180deg, #C0C0C0, #989898); }
+.lb-pod-base.rank3 { min-height: 50px; background: linear-gradient(180deg, #CD7F32, #A05A1A); }
+
+/* ── Rankings list ── */
+.lb-list { display: flex; flex-direction: column; gap: 8px; }
+.lb-row {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1.5px solid rgba(255,255,255,.06);
+  border-radius: 16px; padding: 12px 16px;
+  transition: all .2s;
+  animation: slideUp .4s ease forwards;
+  opacity: 0;
+}
+.lb-row:hover { border-color: rgba(255,255,255,.12); transform: translateX(3px); }
+.lb-row.is-me {
+  border-color: rgba(88,204,2,.35);
+  background: rgba(88,204,2,.05);
+}
+.lb-row.is-me:hover { border-color: rgba(88,204,2,.5); }
+
+.lb-rank-num {
+  width: 32px; text-align: center;
+  font-size: .9rem; font-weight: 900;
+  color: var(--muted); flex-shrink: 0;
+}
+.lb-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 900;
+  flex-shrink: 0;
+}
+.lb-info { flex: 1; min-width: 0; }
+.lb-name {
+  font-weight: 800; font-size: .9rem;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lb-league-tag {
+  font-size: .72rem; color: var(--muted);
+  font-weight: 700; margin-top: 2px;
+}
+.lb-score { font-weight: 900; font-size: .95rem; color: var(--yellow); flex-shrink: 0; }
+
+/* ── Right panel ── */
+.lb-leagues-panel {
+  background: rgba(255,255,255,.04);
+  border: 1.5px solid rgba(255,255,255,.07);
+  border-radius: 20px; padding: 20px;
+}
+.lb-leagues-panel-title {
+  font-size: .8rem; font-weight: 900;
+  color: var(--muted); text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 14px;
+}
+.lb-league-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 10px; border-radius: 12px;
+  cursor: pointer; transition: background .15s;
+}
+.lb-league-row:hover { background: rgba(255,255,255,.05); }
+.lb-league-row.current { background: rgba(88,204,2,.08); }
+.lb-league-row-icon { font-size: 1.4rem; }
+.lb-league-row-name { font-weight: 800; font-size: .9rem; }
+.lb-league-row-xp   { font-size: .72rem; color: var(--muted); font-weight: 700; margin-top: 1px; }
+.lb-league-badge-me {
+  font-size: .65rem; font-weight: 900;
+  background: var(--green); color: #fff;
+  padding: 3px 8px; border-radius: 100px;
+  margin-left: auto; white-space: nowrap;
+}
+</style>
+</head>
+<body>
+<div class="lb-page">
+  <div id="sidenav-mount"></div>
+
+  <main class="lb-main">
+    <div id="top-bar"></div>
+
+    <div class="lb-layout">
+      <!-- Left col -->
+      <div class="lb-left">
+        <div class="lb-header">
+          <div class="lb-header-icon">🏆</div>
+          <div>
+            <div class="lb-header-title">Рейтинг</div>
+            <div class="lb-header-sub">Ким эн жогорку XP топтогон?</div>
+          </div>
+        </div>
+
+        <div class="lb-leagues" id="lb-leagues"></div>
+        <div class="lb-podium" id="lb-podium"></div>
+        <div class="lb-list"   id="lb-list">
+          <div style="text-align:center;color:var(--muted);padding:40px 0">Жүктөлүүдө...</div>
+        </div>
+      </div>
+
+      <!-- Right panel (desktop) -->
+      <div class="lb-right">
+        <div class="lb-leagues-panel" id="lb-right-panel"></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="bottom-nav-mount"></div>
+</div>
+
+<script src="/js/data.js"></script>
+<script src="/js/app.js"></script>
+<script>
+let currentLeague = null;
+let allUsers = [];
+
+(async () => {
+  requireAuth();
+  await Store.init();
+
+  renderTopNav(document.getElementById('top-bar'));
+  renderSideNav(document.getElementById('sidenav-mount'));
+  renderBottomNav(document.getElementById('bottom-nav-mount'));
+  updateNavStats();
+
+  // League filter pills
+  const leaguesEl = document.getElementById('lb-leagues');
+  leaguesEl.innerHTML =
+    `<div class="lb-pill active" onclick="filterLeague(null)" id="lb-btn-all">🌍 Баары</div>` +
+    FL_LEAGUES.map(l => `<div class="lb-pill" id="lb-btn-${l.id}" onclick="filterLeague('${l.id}')">${l.emoji} ${l.name}</div>`).join('');
+
+  // Right panel
+  renderRightPanel();
+
+  try {
+    const data = await API.leaderboard();
+    allUsers = data.users || data || [];
+    renderLeaderboard(allUsers);
+  } catch {
+    document.getElementById('lb-list').innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px">Маалымат жүктөлбөдү</div>';
+  }
+})();
+
+function filterLeague(id) {
+  currentLeague = id;
+  document.querySelectorAll('.lb-pill').forEach(b => b.classList.remove('active'));
+  (id ? document.getElementById(`lb-btn-${id}`) : document.getElementById('lb-btn-all'))?.classList.add('active');
+  const filtered = id ? allUsers.filter(u => getLeague(u.state?.xp || u.xp || 0).id === id) : allUsers;
+  renderLeaderboard(filtered);
+}
+
+function renderLeaderboard(users) {
+  const myId  = Store.user?._id || Store.user?.id;
+  const sorted = [...users].sort((a,b) => (b.state?.xp||b.xp||0) - (a.state?.xp||a.xp||0));
+
+  // Podium
+  const top3 = sorted.slice(0,3);
+  const podiumOrder = top3.length >= 2 ? [top3[1], top3[0], top3[2]].filter(Boolean) : top3;
+  const rankClasses = top3.length >= 2 ? ['rank2','rank1','rank3'] : ['rank1'];
+  const rankNums    = top3.length >= 2 ? ['2','1','3']             : ['1'];
+
+  document.getElementById('lb-podium').innerHTML = podiumOrder.map((u, i) => {
+    if (!u) return '';
+    const xp   = u.state?.xp || u.xp || 0;
+    const init = (u.name||'?')[0].toUpperCase();
+    const rc   = rankClasses[i];
+    const rn   = rankNums[i];
+    return `<div class="lb-pod-item">
+      <div class="lb-pod-avatar ${rc}">${init}</div>
+      <div class="lb-pod-name">${u.name || 'Аноним'}</div>
+      <div class="lb-pod-xp">⭐ ${xp} XP</div>
+      <div class="lb-pod-base ${rc}">${rn}</div>
+    </div>`;
+  }).join('');
+
+  // List (from rank 4)
+  const listEl = document.getElementById('lb-list');
+  if (!sorted.length) { listEl.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px">Маалымат жок</div>'; return; }
+  const listItems = sorted.slice(top3.length >= 3 ? 3 : top3.length);
+  const startIdx  = top3.length >= 3 ? 3 : top3.length;
+  const top3HTML  = sorted.slice(0, startIdx).map((u, idx) => {
+    const xp   = u.state?.xp || u.xp || 0;
+    const isMe = u._id === myId || u.id === myId;
+    const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉';
+    const init  = (u.name||'?')[0].toUpperCase();
+    const league = getLeague(xp);
+    return `<div class="lb-row ${isMe ? 'is-me' : ''}" style="animation-delay:${idx*0.05}s">
+      <div class="lb-rank-num">${medal}</div>
+      <div class="lb-avatar">${init}</div>
+      <div class="lb-info">
+        <div class="lb-name">${u.name || 'Аноним'}${isMe ? ' · Сен' : ''}</div>
+        <div class="lb-league-tag">${league.emoji} ${league.name} · ${getLevel(xp)}-деңгел</div>
+      </div>
+      <div class="lb-score">⭐ ${xp}</div>
+    </div>`;
+  }).join('');
+  const restHTML = listItems.map((u, idx) => {
+    const xp   = u.state?.xp || u.xp || 0;
+    const rank = startIdx + idx + 1;
+    const isMe = u._id === myId || u.id === myId;
+    const init = (u.name||'?')[0].toUpperCase();
+    const league = getLeague(xp);
+    return `<div class="lb-row ${isMe ? 'is-me' : ''}" style="animation-delay:${(startIdx+idx)*0.05}s">
+      <div class="lb-rank-num">${rank}</div>
+      <div class="lb-avatar">${init}</div>
+      <div class="lb-info">
+        <div class="lb-name">${u.name || 'Аноним'}${isMe ? ' · Сен' : ''}</div>
+        <div class="lb-league-tag">${league.emoji} ${league.name} · ${getLevel(xp)}-деңгел</div>
+      </div>
+      <div class="lb-score">⭐ ${xp}</div>
+    </div>`;
+  }).join('');
+  listEl.innerHTML = top3HTML + restHTML;
+}
+
+function renderRightPanel() {
+  const panel = document.getElementById('lb-right-panel');
+  if (!panel) return;
+  const myXP = Store.user?.state?.xp || 0;
+  panel.innerHTML = `<div class="lb-leagues-panel-title">🏅 Бардык лигалар</div>` +
+    FL_LEAGUES.map(l => {
+      const isCurrent = getLeague(myXP).id === l.id;
+      return `<div class="lb-league-row ${isCurrent ? 'current' : ''}" onclick="filterLeague('${l.id}')">
+        <span class="lb-league-row-icon">${l.emoji}</span>
+        <div>
+          <div class="lb-league-row-name">${l.name}</div>
+          <div class="lb-league-row-xp">${l.minXP}+ XP</div>
+        </div>
+        ${isCurrent ? '<span class="lb-league-badge-me">Сенин</span>' : ''}
+      </div>`;
+    }).join('');
+}
+</script>
+</body>
+</html>

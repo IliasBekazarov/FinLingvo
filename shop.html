@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FinLingvo — Дүкөн</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .gems-display-large {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.4rem 1.6rem;
+      background: linear-gradient(135deg, rgba(28,176,246,0.12), rgba(28,176,246,0.04));
+      border: 1.5px solid rgba(28,176,246,0.3);
+      border-radius: 20px;
+      margin-bottom: 1.4rem;
+      animation: slide-up 0.4s ease both;
+    }
+    .daily-reward-card {
+      background: linear-gradient(135deg, rgba(255,217,0,0.12), rgba(255,150,0,0.04));
+      border: 2px solid rgba(255,217,0,0.35);
+      border-radius: 20px;
+      padding: 1.3rem 1.5rem;
+      margin-bottom: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      animation: slide-up 0.4s ease 0.08s both;
+    }
+    .streak-shop-card {
+      background: linear-gradient(135deg, rgba(255,150,0,0.12), rgba(255,150,0,0.04)) !important;
+      border-color: rgba(255,150,0,0.3) !important;
+    }
+    .streak-shop-card:hover { border-color: rgba(255,150,0,0.6) !important; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <a href="learn.html" class="sidebar-logo" style="text-decoration:none;">
+      <div class="sidebar-logo-icon">🦅</div>
+      <div><div class="sidebar-logo-title">FinLingo</div><div class="sidebar-logo-sub">Финансылык саббатулук оюну</div></div>
+    </a>
+    <nav style="flex:1;">
+      <a href="learn.html"       class="nav-item"><span class="nav-icon">📚</span>Үйрөнүү</a>
+      <a href="leaderboard.html" class="nav-item"><span class="nav-icon" style="font-size:0.95rem;">📊</span>Лига</a>
+      <a href="shop.html"        class="nav-item active"><span class="nav-icon">🛒</span>Дүкөн</a>
+      <a href="profile.html"     class="nav-item"><span class="nav-icon">👤</span>Профиль</a>
+      <a href="settings.html"    class="nav-item"><span class="nav-icon">⚙️</span>Орнотуу</a>
+    </nav>
+    <div id="sidebar-user" style="padding:0.6rem;border-top:1px solid rgba(255,255,255,0.06);"></div>
+  </aside>
+
+  <div class="main-content">
+    <div class="top-stats">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <div style="flex:1;"></div>
+      <div class="stat-pill streak">🔥 <span id="stat-streak">0</span></div>
+      <div class="stat-pill gems">💎 <span id="stat-gems">0</span></div>
+      <div class="stat-pill hearts">❤️ <span id="stat-hearts">5</span></div>
+    </div>
+
+    <div class="page-wrap" style="max-width:720px;">
+
+      <h1 style="font-size:1.5rem;font-weight:900;margin-bottom:1.4rem;animation:slide-up 0.4s ease both;">🛒 Дүкөн</h1>
+
+      <!-- Gems balance -->
+      <div class="gems-display-large">
+        <span style="font-size:3rem;">💎</span>
+        <div>
+          <div style="font-size:2rem;font-weight:900;color:#1CB0F6;" id="gems-balance">0</div>
+          <div style="font-size:0.82rem;font-weight:600;color:#7a859e;">Сенин Gem балансың</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+          <div style="font-size:0.7rem;font-weight:800;color:#3d4860;">Gems алуу</div>
+          <div style="font-size:0.68rem;color:#7a859e;font-weight:600;">Сабактарды аяктоо аркылуу</div>
+        </div>
+      </div>
+
+      <!-- Daily reward -->
+      <div class="daily-reward-card">
+        <span style="font-size:2.4rem;">🎁</span>
+        <div style="flex:1;">
+          <div style="font-weight:900;font-size:1.05rem;">Күндөлүк Сыйлык</div>
+          <div style="font-size:0.82rem;font-weight:600;color:#7a859e;">Бүгүн үйрөнүп, +50 💎 ал!</div>
+        </div>
+        <button class="btn-primary" style="width:auto;padding:0.55rem 1.2rem;margin:0;font-size:0.82rem;" id="daily-btn" onclick="claimDaily()">
+          АЛ
+        </button>
+      </div>
+
+      <!-- Category filter -->
+      <div class="shop-cats" id="shop-cats" style="animation:slide-up 0.4s ease 0.12s both;">
+        <button class="cat-btn active" onclick="filterCategory('all', this)">🛒 Баары</button>
+        <button class="cat-btn" onclick="filterCategory('hearts', this)">❤️ Жандар</button>
+        <button class="cat-btn" onclick="filterCategory('boosts', this)">⚡ Boost</button>
+        <button class="cat-btn" onclick="filterCategory('streaks', this)">🔥 Streak</button>
+        <button class="cat-btn" onclick="filterCategory('avatars', this)">🎭 Аватар</button>
+        <button class="cat-btn" onclick="filterCategory('themes', this)">🎨 Тема</button>
+      </div>
+
+      <!-- Shop grid -->
+      <div class="shop-grid" id="shop-grid" style="animation:slide-up 0.4s ease 0.16s both;"></div>
+
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    <div class="mob-nav-items">
+      <a href="learn.html"       class="mob-nav-item"><span class="ico">📚</span>Үйрөнүү</a>
+      <a href="leaderboard.html" class="mob-nav-item"><span class="ico">🏆</span>Лига</a>
+      <a href="shop.html"        class="mob-nav-item active"><span class="ico">🛒</span>Дүкөн</a>
+      <a href="profile.html"     class="mob-nav-item"><span class="ico">👤</span>Профиль</a>
+    </div>
+  </nav>
+
+</div>
+
+<!-- Purchase modal -->
+<div class="modal-overlay" id="purchase-modal" style="display:none;">
+  <div class="modal-card">
+    <div id="purchase-icon" style="font-size:3.5rem;margin-bottom:1rem;animation:bounce-in 0.5s ease;"></div>
+    <h2 style="font-size:1.2rem;font-weight:900;margin-bottom:0.4rem;" id="purchase-name"></h2>
+    <p style="font-size:0.82rem;font-weight:600;color:#7a859e;margin-bottom:0.8rem;" id="purchase-desc"></p>
+    <div class="shop-price" style="justify-content:center;margin:0 auto 1.4rem;" id="purchase-price">💎 0</div>
+    <button class="btn-primary" style="margin-bottom:0.6rem;" id="confirm-buy-btn">САТЫП АЛ</button>
+    <button class="btn-secondary" style="margin-bottom:0;" onclick="closePurchaseModal()">ЖОККО ЧЫГАРУУ</button>
+  </div>
+</div>
+
+<!-- Success modal -->
+<div class="modal-overlay" id="success-modal" style="display:none;">
+  <div class="modal-card">
+    <div style="font-size:4rem;margin-bottom:1rem;animation:bounce-in 0.5s ease;">✅</div>
+    <h2 style="font-size:1.2rem;font-weight:900;margin-bottom:0.4rem;">Сатып алынды!</h2>
+    <p style="font-size:0.82rem;font-weight:600;color:#7a859e;margin-bottom:1.4rem;" id="success-text">Буюм ийгиликтүү жеткирилди!</p>
+    <button class="btn-primary" style="margin-bottom:0;" onclick="document.getElementById('success-modal').style.display='none'">ЖАКШЫ!</button>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if (!AUTH.isLoggedIn()) window.location.href = 'index.html';
+  const user = AUTH.getUser();
+  APP.updateHeaderStats();
+
+  function sidebarUser() {
+    const u = AUTH.getUser(), league = LEAGUES.find(l => l.id === u.league) || LEAGUES[0];
+    document.getElementById('sidebar-user').innerHTML = `<div style="display:flex;align-items:center;gap:0.65rem;padding:0.5rem;"><div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(145deg,#162240,#0b1628);display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:2px solid rgba(28,176,246,0.3);flex-shrink:0;">${u.avatar||'🦅'}</div><div><div style="font-weight:800;font-size:0.85rem;">${u.name}</div><div style="font-size:0.65rem;color:#7a859e;">${league.icon} ${league.name} · ${u.gems} 💎</div></div></div>`;
+  }
+  sidebarUser();
+
+  function openSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('mob-overlay').classList.add('show'); }
+  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('mob-overlay').classList.remove('show'); }
+
+  document.getElementById('gems-balance').textContent = user.gems;
+
+  let currentCategory = 'all';
+  let selectedItem = null;
+
+  function filterCategory(cat, btn) {
+    currentCategory = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderShop();
+  }
+
+  function renderShop() {
+    const grid = document.getElementById('shop-grid');
+    const u = AUTH.getUser();
+    const items = currentCategory === 'all' ? SHOP_ITEMS : SHOP_ITEMS.filter(i => i.category === currentCategory);
+
+    let html = '';
+    items.forEach(item => {
+      const canAfford = u.gems >= item.price;
+      const owned = u.inventory?.includes(item.id) || u.activeBoosts?.some(b => b.id === item.id);
+
+      html += `
+        <div class="shop-card ${item.category === 'streaks' ? 'streak-shop-card' : ''}" onclick="openPurchaseModal('${item.id}')">
+          <span class="shop-ico">${item.icon}</span>
+          <div class="shop-name">${item.name}</div>
+          <div class="shop-desc">${item.description}</div>
+          ${owned
+            ? `<button class="buy-btn" style="background:#58CC02;cursor:default;" disabled>✓ Бар</button>`
+            : item.price === 0
+            ? `<button class="buy-btn" style="background:var(--card3);color:var(--text2);cursor:default;" disabled>Бекер</button>`
+            : `<div class="shop-price" style="justify-content:center;margin:0 auto 0.5rem;">💎 ${item.price}</div>
+               <button class="buy-btn ${!canAfford ? '' : ''}" style="${!canAfford ? 'background:var(--card3);color:var(--text2);cursor:not-allowed;' : ''}">
+                 ${canAfford ? 'САТЫП АЛ' : '💎 ЖЕТИШСИЗ'}
+               </button>`
+          }
+        </div>
+      `;
+    });
+
+    grid.innerHTML = html;
+  }
+
+  function openPurchaseModal(itemId) {
+    const item = SHOP_ITEMS.find(i => i.id === itemId);
+    if (!item) return;
+    selectedItem = item;
+
+    document.getElementById('purchase-icon').textContent = item.icon;
+    document.getElementById('purchase-name').textContent = item.name;
+    document.getElementById('purchase-desc').textContent = item.description;
+    document.getElementById('purchase-price').textContent = `💎 ${item.price} Gem`;
+
+    const u = AUTH.getUser();
+    const confirmBtn = document.getElementById('confirm-buy-btn');
+    if (u.gems < item.price) {
+      confirmBtn.textContent = '💎 Gem жетишсиз';
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = '0.5';
+    } else {
+      confirmBtn.textContent = `САТЫП АЛ — 💎 ${item.price}`;
+      confirmBtn.disabled = false;
+      confirmBtn.style.opacity = '1';
+    }
+
+    document.getElementById('purchase-modal').style.display = 'flex';
+    confirmBtn.onclick = confirmPurchase;
+    if (typeof APP !== 'undefined' && APP.audio) APP.audio.play('click');
+  }
+
+  function closePurchaseModal() {
+    document.getElementById('purchase-modal').style.display = 'none';
+    selectedItem = null;
+  }
+
+  function confirmPurchase() {
+    if (!selectedItem) return;
+    const result = AUTH.purchaseItem(selectedItem.id);
+
+    if (result.success) {
+      closePurchaseModal();
+      if (typeof APP !== 'undefined' && APP.audio) APP.audio.play('levelup');
+
+      document.getElementById('success-text').textContent = `${selectedItem.icon} ${selectedItem.name} ийгиликтүү алынды!`;
+      document.getElementById('success-modal').style.display = 'flex';
+
+      const u = AUTH.getUser();
+      document.getElementById('gems-balance').textContent = u.gems;
+      document.getElementById('stat-gems').textContent = u.gems;
+      document.getElementById('stat-hearts').textContent = u.hearts;
+      sidebarUser();
+      renderShop();
+    } else {
+      const msg = result.message || 'Ката болду';
+      if (typeof APP !== 'undefined' && APP.toast) APP.toast.show(msg, 'error');
+    }
+  }
+
+  function claimDaily() {
+    const today = new Date().toDateString();
+    const u = AUTH.getUser();
+
+    if (u.lastDailyClaim === today) {
+      if (typeof APP !== 'undefined' && APP.toast) APP.toast.show('Бүгүн алдың! Эртең кел 🎁', 'warning');
+      return;
+    }
+
+    AUTH.addGems(50);
+    const updated = AUTH.getUser();
+    updated.lastDailyClaim = today;
+    AUTH.saveUser(updated);
+
+    if (typeof APP !== 'undefined' && APP.audio) APP.audio.play('complete');
+    if (typeof APP !== 'undefined' && APP.toast) APP.toast.show('🎁 +50 💎 Жылдык сыйлык алдың!', 'success');
+    document.getElementById('gems-balance').textContent = updated.gems;
+    document.getElementById('stat-gems').textContent = updated.gems;
+
+    const btn = document.getElementById('daily-btn');
+    btn.textContent = 'АЛДЫ ✓';
+    btn.disabled = true;
+    btn.style.background = '#58CC02';
+    btn.style.boxShadow = '0 4px 16px rgba(88,204,2,0.3)';
+  }
+
+  // Check if daily already claimed
+  (function() {
+    const u = AUTH.getUser();
+    const btn = document.getElementById('daily-btn');
+    if (u.lastDailyClaim === new Date().toDateString()) {
+      btn.textContent = 'АЛДЫ ✓';
+      btn.disabled = true;
+      btn.style.background = '#58CC02';
+    }
+  })();
+
+  renderShop();
+</script>
+</body>
+</html>
