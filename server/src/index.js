@@ -15,9 +15,28 @@ import { errorHandler }  from './middleware/errorHandler.js'
 const app  = express()
 const PORT = process.env.PORT || 4000
 
+// ── CORS ─────────────────────────────────────────────────────
+// CLIENT_URL may be a comma-separated list, e.g.:
+//   https://fin-lingvo.vercel.app,https://finlingvo.vercel.app
+const allowedOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean)
+
+app.use(cors({
+  origin(origin, cb) {
+    // Allow requests with no origin (curl, Postman, server-to-server)
+    if (!origin) return cb(null, true)
+    if (allowedOrigins.includes(origin)) return cb(null, true)
+    // Also allow any *.vercel.app preview URL during development
+    if (origin.endsWith('.vercel.app')) return cb(null, true)
+    cb(new Error(`CORS: origin ${origin} not allowed`))
+  },
+  credentials: true,
+}))
+
 // Security
 app.use(helmet())
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }))
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }))
 
 // Parsing
