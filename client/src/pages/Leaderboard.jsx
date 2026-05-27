@@ -20,17 +20,17 @@ function LeagueChip({ lg, active, isUser, onClick }) {
       onClick={onClick}
       whileTap={{ scale: 0.88 }}
       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-      className="relative flex-shrink-0 flex flex-col items-center justify-center rounded-2xl cursor-pointer"
+      className="relative flex-shrink-0 flex flex-col items-center justify-center rounded-xl cursor-pointer"
       style={{
-        width: active ? 72 : 58,
-        height: 64,
+        width: active ? 62 : 50,
+        height: 56,
         background: active
           ? `linear-gradient(145deg,${lg.bg},${lg.bg}bb)`
           : 'rgba(255,255,255,0.03)',
         border: `1.5px solid ${active ? lg.color + '70' : 'rgba(255,255,255,0.06)'}`,
-        boxShadow: active ? `0 0 22px ${lg.glowColor}, 0 4px 16px rgba(0,0,0,0.4)` : 'none',
+        boxShadow: active ? `0 0 18px ${lg.glowColor}, 0 4px 12px rgba(0,0,0,0.4)` : 'none',
         transition: 'width 0.25s ease, background 0.2s, border-color 0.2s, box-shadow 0.2s',
-        gap: 5,
+        gap: 4,
       }}
     >
       {/* "СЕН" badge on user's league */}
@@ -45,9 +45,9 @@ function LeagueChip({ lg, active, isUser, onClick }) {
 
       {/* Emoji */}
       <motion.span
-        animate={active ? { scale: [1, 1.12, 1] } : { scale: 1 }}
+        animate={active ? { scale: [1, 1.1, 1] } : { scale: 1 }}
         transition={{ duration: 2.8, repeat: active ? Infinity : 0, ease: 'easeInOut' }}
-        style={{ fontSize: active ? 26 : 20, lineHeight: 1 }}
+        style={{ fontSize: active ? 22 : 17, lineHeight: 1 }}
       >
         {lg.emoji}
       </motion.span>
@@ -56,9 +56,9 @@ function LeagueChip({ lg, active, isUser, onClick }) {
       <span
         className="font-black leading-none"
         style={{
-          fontSize: active ? 8 : 7,
+          fontSize: 7,
           color: active ? lg.color : '#2d3448',
-          letterSpacing: '0.08em',
+          letterSpacing: '0.06em',
         }}
       >
         {lg.name}
@@ -90,7 +90,7 @@ function Avatar({ emoji, size = 40, rank }) {
         {emoji || '👤'}
       </motion.div>
       {rank === 1 && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-xl leading-none select-none">
+        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-base leading-none select-none">
           👑
         </div>
       )}
@@ -105,9 +105,9 @@ function Podium({ top3, lg }) {
   if (top3.length < 3) return null
 
   const SLOTS = [
-    { u: top3[1], rank: 2, barH: 56,  avSz: 46, color: '#C0C0C0', medal: '🥈' },
-    { u: top3[0], rank: 1, barH: 84,  avSz: 58, color: '#FFD700', medal: '🥇' },
-    { u: top3[2], rank: 3, barH: 38,  avSz: 40, color: '#CD7F32', medal: '🥉' },
+    { u: top3[1], rank: 2, barH: 48,  avSz: 40, color: '#C0C0C0', medal: '🥈' },
+    { u: top3[0], rank: 1, barH: 72,  avSz: 52, color: '#FFD700', medal: '🥇' },
+    { u: top3[2], rank: 3, barH: 32,  avSz: 36, color: '#CD7F32', medal: '🥉' },
   ]
 
   return (
@@ -131,7 +131,7 @@ function Podium({ top3, lg }) {
       </div>
 
       {/* Podium */}
-      <div className="flex items-end justify-center gap-2 px-3 pt-8 pb-0">
+      <div className="flex items-end justify-center gap-1.5 px-2 pt-6 pb-0">
         {SLOTS.map(({ u, rank, barH, avSz, color, medal }, pi) => (
           <motion.div
             key={rank}
@@ -148,8 +148,8 @@ function Podium({ top3, lg }) {
               {u?.name}
             </div>
             <div
-              className="font-black mb-2.5"
-              style={{ color, fontSize: 10 }}
+              className="font-black mb-2"
+              style={{ color, fontSize: 9 }}
             >
               {(u?.weeklyXP || 0).toLocaleString()} XP
             </div>
@@ -361,32 +361,31 @@ export default function Leaderboard() {
         >
           {/* ── Hero banner ── */}
           <motion.div
-            className="rounded-3xl p-5 mb-5 relative overflow-hidden"
+            className="rounded-2xl p-4 mb-4 relative overflow-hidden"
             style={{
               background: `linear-gradient(135deg,${lg.bg} 0%,${lg.bg}55 55%,#07090f 100%)`,
               border: `1px solid ${lg.color}32`,
-              boxShadow: `0 0 52px ${lg.glowColor}, 0 16px 48px rgba(0,0,0,0.55)`,
+              boxShadow: `0 0 40px ${lg.glowColor}, 0 8px 32px rgba(0,0,0,0.5)`,
             }}
           >
             <div className="absolute inset-0 opacity-[0.03]" style={STRIPE} />
-            {/* Ambient orb */}
             <div
-              className="absolute -top-14 -right-14 w-64 h-64 rounded-full blur-3xl pointer-events-none"
+              className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl pointer-events-none"
               style={{ background: lg.color, opacity: 0.1 }}
             />
 
             {/* League identity row */}
-            <div className="relative flex items-center gap-4 mb-5">
+            <div className="relative flex items-center gap-3 mb-4">
               <motion.div
                 animate={{
                   boxShadow: [
-                    `0 0 18px ${lg.glowColor}`,
-                    `0 0 44px ${lg.glowColor}`,
-                    `0 0 18px ${lg.glowColor}`,
+                    `0 0 14px ${lg.glowColor}`,
+                    `0 0 32px ${lg.glowColor}`,
+                    `0 0 14px ${lg.glowColor}`,
                   ],
                 }}
                 transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-                className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl flex-shrink-0"
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
                 style={{
                   background: `${lg.color}16`,
                   border: `1px solid ${lg.color}32`,
@@ -397,37 +396,37 @@ export default function Leaderboard() {
 
               <div className="flex-1 min-w-0">
                 <div
-                  className="font-black tracking-[3px] uppercase mb-0.5"
-                  style={{ fontSize: 9, color: lg.color }}
+                  className="font-black uppercase mb-0.5"
+                  style={{ fontSize: 8, letterSpacing: '0.12em', color: lg.color }}
                 >
                   ЖУМАЛЫК РЕЙТИНГ
                 </div>
-                <div className="text-xl font-black leading-tight text-white">
+                <div className="text-base font-black leading-tight text-white">
                   {lg.name} ЛИГАСЫ
                 </div>
-                <div className="font-semibold mt-0.5" style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)' }}>
+                <div className="font-semibold mt-0.5" style={{ fontSize: 9, color: 'rgba(255,255,255,0.28)' }}>
                   Жогорку 5 → кийинки лигага чыгат
                 </div>
               </div>
             </div>
 
             {/* Stats row */}
-            <div className="relative grid grid-cols-3 gap-2">
+            <div className="relative grid grid-cols-3 gap-1.5">
               {[
-                { v: myRank ? `#${myRank}` : '—',          label: 'ОРНУМ',      color: '#1CB0F6', icon: '📊' },
-                { v: (me?.weeklyXP ?? 0).toLocaleString(),  label: 'ЖУМА XP',   color: '#58CC02', icon: '⭐' },
-                { v: `${daysLeft}`,                         label: 'КҮН КАЛДЫ', color: '#FF9600', icon: '⏰' },
+                { v: myRank ? `#${myRank}` : '—',         label: 'ОРНУМ',    color: '#1CB0F6', icon: '📊' },
+                { v: (me?.weeklyXP ?? 0).toLocaleString(), label: 'ЖУМА XP',  color: '#58CC02', icon: '⭐' },
+                { v: `${daysLeft}`,                        label: 'КҮН КАЛДЫ',color: '#FF9600', icon: '⏰' },
               ].map(({ v, label, color, icon }) => (
                 <div
                   key={label}
-                  className="rounded-2xl p-3 text-center"
+                  className="rounded-xl p-2 text-center"
                   style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.06)' }}
                 >
-                  <div className="text-lg mb-0.5">{icon}</div>
-                  <div className="text-base font-black leading-none" style={{ color }}>{v}</div>
+                  <div className="text-sm leading-none mb-0.5">{icon}</div>
+                  <div className="text-sm font-black leading-none mt-0.5" style={{ color }}>{v}</div>
                   <div
-                    className="font-extrabold tracking-wide uppercase mt-1"
-                    style={{ fontSize: 8, color: 'rgba(255,255,255,0.18)' }}
+                    className="font-extrabold uppercase mt-1 leading-none"
+                    style={{ fontSize: 7, letterSpacing: '0.05em', color: 'rgba(255,255,255,0.2)' }}
                   >
                     {label}
                   </div>
