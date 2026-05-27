@@ -105,9 +105,9 @@ function Podium({ top3, lg }) {
   if (top3.length < 3) return null
 
   const SLOTS = [
-    { u: top3[1], rank: 2, barH: 58,  avSz: 50, color: '#C0C0C0', medal: '🥈' },
-    { u: top3[0], rank: 1, barH: 88,  avSz: 62, color: '#FFD700', medal: '🥇' },
-    { u: top3[2], rank: 3, barH: 40,  avSz: 44, color: '#CD7F32', medal: '🥉' },
+    { u: top3[1], rank: 2, barH: 56,  avSz: 46, color: '#C0C0C0', medal: '🥈' },
+    { u: top3[0], rank: 1, barH: 84,  avSz: 58, color: '#FFD700', medal: '🥇' },
+    { u: top3[2], rank: 3, barH: 38,  avSz: 40, color: '#CD7F32', medal: '🥉' },
   ]
 
   return (
@@ -131,7 +131,7 @@ function Podium({ top3, lg }) {
       </div>
 
       {/* Podium */}
-      <div className="flex items-end justify-center gap-3 px-5 pt-8 pb-0">
+      <div className="flex items-end justify-center gap-2 px-3 pt-8 pb-0">
         {SLOTS.map(({ u, rank, barH, avSz, color, medal }, pi) => (
           <motion.div
             key={rank}
@@ -142,8 +142,8 @@ function Podium({ top3, lg }) {
           >
             <Avatar emoji={u?.avatar} size={avSz} rank={rank} />
             <div
-              className="mt-2 text-xs font-extrabold text-center truncate w-full px-1"
-              style={{ color: rank === 1 ? '#fff' : '#7a859e', fontSize: rank === 1 ? 12 : 10 }}
+              className="mt-2 font-extrabold text-center truncate w-full"
+              style={{ color: rank === 1 ? '#fff' : '#7a859e', fontSize: rank === 1 ? 11 : 10 }}
             >
               {u?.name}
             </div>
@@ -412,7 +412,7 @@ export default function Leaderboard() {
             </div>
 
             {/* Stats row */}
-            <div className="relative grid grid-cols-3 gap-2.5">
+            <div className="relative grid grid-cols-3 gap-2">
               {[
                 { v: myRank ? `#${myRank}` : '—',          label: 'ОРНУМ',      color: '#1CB0F6', icon: '📊' },
                 { v: (me?.weeklyXP ?? 0).toLocaleString(),  label: 'ЖУМА XP',   color: '#58CC02', icon: '⭐' },
@@ -426,7 +426,7 @@ export default function Leaderboard() {
                   <div className="text-lg mb-0.5">{icon}</div>
                   <div className="text-base font-black leading-none" style={{ color }}>{v}</div>
                   <div
-                    className="font-extrabold tracking-widest uppercase mt-1"
+                    className="font-extrabold tracking-wide uppercase mt-1"
                     style={{ fontSize: 8, color: 'rgba(255,255,255,0.18)' }}
                   >
                     {label}
